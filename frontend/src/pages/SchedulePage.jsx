@@ -6,8 +6,11 @@ import api from '../utils/api';
 import { formatTanggal } from '../utils/helpers';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import { toast } from 'react-toastify';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const SchedulePage = () => {
+  useDocumentTitle('Schedule');
+  
   const [salesOrders, setSalesOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentTime, setCurrentTime] = useState(new Date());

@@ -4,8 +4,11 @@ import { FiDownload, FiFileText } from 'react-icons/fi';
 import api from '../utils/api';
 import { formatRupiah, formatAngka } from '../utils/helpers';
 import { toast } from 'react-toastify';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const ReportPage = () => {
+  useDocumentTitle('Reports');
+  
   const [reportType, setReportType] = useState('sales_orders');
   const [bulan, setBulan] = useState('');
   const [tahun, setTahun] = useState(new Date().getFullYear());

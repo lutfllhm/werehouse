@@ -19,6 +19,7 @@ import api from '../utils/api';
 import { formatRupiah, formatAngka, formatTanggal } from '../utils/helpers';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import { toast } from 'react-toastify';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 ChartJS.register(
   CategoryScale,
@@ -34,6 +35,8 @@ ChartJS.register(
 );
 
 const DashboardPage = () => {
+  useDocumentTitle('Dashboard');
+  
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState(null);
   const [refreshing, setRefreshing] = useState(false);

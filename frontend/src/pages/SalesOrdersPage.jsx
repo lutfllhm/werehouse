@@ -5,8 +5,11 @@ import api from '../utils/api';
 import { formatRupiah, formatTanggal, getStatusColor, debounce } from '../utils/helpers';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import { toast } from 'react-toastify';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const SalesOrdersPage = () => {
+  useDocumentTitle('Sales Orders');
+  
   const [salesOrders, setSalesOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
