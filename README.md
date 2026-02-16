@@ -261,13 +261,52 @@ ACCURATE_DATABASE_ID=your_db_id_here
 
 ## 🚀 Deployment ke VPS
 
-### Hosting ke VPS Hostinger
+### 🐳 Deployment dengan Docker (RECOMMENDED)
 
-Aplikasi ini siap di-deploy ke VPS Hostinger. Tersedia panduan lengkap dan tools untuk memudahkan deployment.
+**⭐ PANDUAN LENGKAP ALL-IN-ONE:**
+- **[📘 PANDUAN LENGKAP HOSTING VPS](PANDUAN_LENGKAP_HOSTING_VPS.md)** - Panduan SATU FILE dari NOL sampai ONLINE! (30-45 menit)
+
+Cara tercepat dan termudah untuk deploy aplikasi iWare!
+
+**⚡ Quick Start:**
+```bash
+# 1. Install Docker di VPS
+curl -fsSL https://get.docker.com -o get-docker.sh
+sh get-docker.sh
+
+# 2. Clone & Setup
+git clone https://github.com/username/iware-app.git /opt/iware
+cd /opt/iware
+cp .env.docker .env
+nano .env  # Edit konfigurasi
+
+# 3. Deploy!
+docker compose up -d
+
+# 4. Setup Nginx + SSL (lihat panduan lengkap)
+```
+
+**📖 Panduan Docker Lainnya:**
+- **[🐳 Panduan Docker Deployment](PANDUAN_DOCKER_DEPLOYMENT.md)** - Panduan detail Docker
+- **[⚡ Docker Quick Start](DOCKER_QUICK_START.md)** - Quick start 10 menit
+- Script helper: `./docker-deploy.sh`
+
+**Keuntungan Docker:**
+- ✅ Deploy dalam 30-45 menit (termasuk setup VPS)
+- ✅ Tidak perlu install Node.js, MySQL, Nginx manual
+- ✅ Konsisten di semua environment
+- ✅ Mudah rollback dan update
+
+---
+
+### Hosting Manual ke VPS Hostinger
+
+Jika tidak ingin menggunakan Docker, tersedia panduan manual lengkap.
 
 **⭐ MULAI DISINI:** [README_DEPLOYMENT.md](README_DEPLOYMENT.md)
 
-**📖 Panduan Deployment:**
+**📖 Panduan Deployment Manual:**
+- **[🚀 Panduan VPS dari NOL](PANDUAN_VPS_DARI_NOL.md)** - Panduan lengkap dari beli VPS sampai online!
 - **[Panduan Lengkap VPS Hostinger](PANDUAN_HOSTING_VPS_HOSTINGER.md)** - Panduan detail step-by-step (±15 hal)
 - **[Quick Start Deployment](QUICK_START_DEPLOYMENT.md)** - Checklist cepat deployment (±5 hal)
 - **[Index Deployment](INDEX_DEPLOYMENT.md)** - Index semua dokumentasi deployment
