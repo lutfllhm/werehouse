@@ -3,11 +3,8 @@ import { motion } from 'framer-motion';
 import { FiUser, FiLock, FiSave } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
-import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const SettingsPage = () => {
-  useDocumentTitle('Settings');
-  
   const { user, updateProfile } = useAuth();
   const [formData, setFormData] = useState({
     nama: user?.nama || '',

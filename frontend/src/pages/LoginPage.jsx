@@ -5,11 +5,8 @@ import { FiMail, FiLock, FiEye, FiEyeOff, FiPackage, FiPrinter } from 'react-ico
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
 import LoadingSpinner from '../components/common/LoadingSpinner';
-import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const LoginPage = () => {
-  useDocumentTitle('Login');
-  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);

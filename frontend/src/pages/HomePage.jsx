@@ -4,7 +4,6 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { FiPackage, FiTrendingUp, FiClock, FiShield, FiZap, FiUsers } from 'react-icons/fi';
 
 const HomePage = () => {
-  useDocumentTitle('Home');
   const [scrollY, setScrollY] = useState(0);
   const { scrollYProgress } = useScroll();
   

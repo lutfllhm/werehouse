@@ -4,11 +4,8 @@ import { FiPlus, FiEdit2, FiTrash2, FiX } from 'react-icons/fi';
 import api from '../utils/api';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import { toast } from 'react-toastify';
-import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const UsersPage = () => {
-  useDocumentTitle('Users');
-  
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
