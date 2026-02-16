@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # iWare - Warehouse Monitoring & Schedule System
 
 <div align="center">
@@ -368,10 +369,6 @@ Source code menggunakan **Bahasa Indonesia** untuk memudahkan maintenance oleh t
 
 <div align="center">
 
+=======
+>>>>>>> 9b898c310c7268aa5b922f65ca03caad516a5375
 **iWare Warehouse Monitoring System**
-
-Solusi profesional untuk monitoring gudang modern
-
-Made with ❤️ in Indonesia
-
-</div>
