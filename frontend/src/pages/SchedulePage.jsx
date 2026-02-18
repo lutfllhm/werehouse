@@ -126,150 +126,132 @@ const SchedulePage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-6 relative overflow-hidden">
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <motion.div
-          animate={{
-            scale: [1, 1.2, 1],
-            rotate: [0, 90, 0],
-            opacity: [0.03, 0.06, 0.03]
+    <div className="min-h-screen bg-yellow-300 p-4 md:p-8 relative overflow-hidden">
+      {/* Neo-Brutalism Background Pattern */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-10">
+        <div className="absolute top-0 left-0 w-full h-full" 
+          style={{
+            backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 10px, black 10px, black 11px)`,
           }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-br from-blue-500 to-purple-500 rounded-full blur-3xl"
-        />
-        <motion.div
-          animate={{
-            scale: [1.2, 1, 1.2],
-            rotate: [90, 0, 90],
-            opacity: [0.03, 0.06, 0.03]
-          }}
-          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-          className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-gradient-to-tl from-cyan-500 to-blue-500 rounded-full blur-3xl"
         />
       </div>
 
-      {/* Header dengan Logo dan Waktu */}
+      {/* Header dengan Logo dan Waktu - Asymmetric */}
       <motion.div 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="mb-8 flex items-center justify-between px-8 py-6 bg-gradient-to-r from-slate-800/90 to-blue-900/90 backdrop-blur-xl rounded-2xl border border-blue-500/30 shadow-2xl relative z-10"
+        initial={{ opacity: 0, x: -50, rotate: -2 }}
+        animate={{ opacity: 1, x: 0, rotate: 0 }}
+        className="mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 px-6 py-5 bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] relative z-10 -rotate-1"
       >
-        <div className="flex items-center gap-6">
+        <div className="flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-6 w-full md:w-auto">
           <motion.button
             onClick={() => navigate('/dashboard')}
-            whileHover={{ scale: 1.05, x: -5 }}
+            whileHover={{ scale: 1.05, rotate: -3 }}
             whileTap={{ scale: 0.95 }}
-            className="group px-5 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 rounded-xl transition-all duration-300 border border-blue-400/50 flex items-center gap-3 shadow-lg hover:shadow-blue-500/50"
+            className="px-4 py-3 bg-black text-white font-black text-sm tracking-wider border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all flex items-center gap-2"
             title="Kembali ke Dashboard"
           >
-            <FiArrowLeft className="w-5 h-5 text-white group-hover:translate-x-[-4px] transition-transform" />
-            <span className="text-white text-sm font-semibold tracking-wide">KEMBALI</span>
+            <FiArrowLeft className="w-5 h-5" />
+            BACK
           </motion.button>
-          <div className="flex items-center gap-4">
+          
+          <div className="flex items-center gap-3">
             <motion.div 
               animate={{ 
-                scaleY: [1, 1.2, 1],
-                boxShadow: [
-                  "0 0 20px rgba(251, 191, 36, 0.5)",
-                  "0 0 40px rgba(251, 191, 36, 0.8)",
-                  "0 0 20px rgba(251, 191, 36, 0.5)"
-                ]
+                scaleY: [1, 1.3, 1],
               }}
-              transition={{ duration: 2, repeat: Infinity }}
-              className="w-2 h-12 bg-gradient-to-b from-yellow-400 to-orange-500 rounded-full"
+              transition={{ duration: 1.5, repeat: Infinity }}
+              className="w-3 h-16 bg-black border-2 border-black"
             />
             <div>
               <motion.div 
-                animate={{ 
-                  backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"]
-                }}
-                transition={{ duration: 5, repeat: Infinity }}
-                className="text-4xl font-black bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-500 bg-clip-text text-transparent tracking-tight"
-                style={{ backgroundSize: "200% 200%" }}
+                initial={{ x: -20 }}
+                animate={{ x: 0 }}
+                className="text-3xl md:text-5xl font-black text-black tracking-tighter uppercase"
+                style={{ fontFamily: 'Arial Black, sans-serif' }}
               >
-                JADWAL PRODUKSI
+                JADWAL
               </motion.div>
-              <div className="text-sm text-blue-300 font-medium mt-1 flex items-center gap-2">
-                <FiPackage className="w-4 h-4" />
-                Production Schedule Board
+              <div className="text-base md:text-lg font-bold text-black uppercase tracking-wide -mt-1">
+                Produksi
               </div>
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-8">
+
+        <div className="flex flex-col md:flex-row items-start md:items-center gap-4 w-full md:w-auto">
           <motion.div 
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2 }}
-            className="text-right bg-slate-900/50 px-6 py-4 rounded-xl border border-blue-500/30 backdrop-blur-sm"
+            initial={{ opacity: 0, scale: 0.8, rotate: 2 }}
+            animate={{ opacity: 1, scale: 1, rotate: 2 }}
+            transition={{ delay: 0.1 }}
+            className="bg-cyan-400 px-5 py-4 border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] rotate-2"
           >
-            <div className="flex items-center gap-3 mb-2">
-              <FiClock className="w-5 h-5 text-yellow-400" />
+            <div className="flex items-center gap-3 mb-1">
+              <FiClock className="w-5 h-5 text-black" />
               <motion.div 
-                animate={{ 
-                  backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"]
-                }}
-                transition={{ duration: 3, repeat: Infinity }}
-                className="text-5xl font-black bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent tabular-nums tracking-tight"
-                style={{ backgroundSize: "200% 200%" }}
+                className="text-4xl md:text-5xl font-black text-black tabular-nums tracking-tighter"
+                style={{ fontFamily: 'Arial Black, sans-serif' }}
               >
                 {formatTime(currentTime)}
               </motion.div>
             </div>
-            <div className="text-sm text-blue-300 font-medium tracking-wide flex items-center gap-2">
+            <div className="text-xs md:text-sm font-bold text-black uppercase tracking-wide flex items-center gap-2">
               <FiCalendar className="w-4 h-4" />
               {currentTime.toLocaleDateString('id-ID', { 
-                weekday: 'long',
                 day: '2-digit',
-                month: 'long',
+                month: 'short',
                 year: 'numeric'
               })}
             </div>
           </motion.div>
+
           <motion.button 
             onClick={() => loadSchedule(true)}
             disabled={isRefreshing}
-            whileHover={{ scale: 1.1, rotate: 180 }}
+            whileHover={{ scale: 1.1, rotate: -5 }}
             whileTap={{ scale: 0.9 }}
             animate={isRefreshing ? { rotate: 360 } : {}}
             transition={isRefreshing ? { duration: 1, repeat: Infinity, ease: "linear" } : {}}
-            className="group px-5 py-5 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 rounded-xl transition-all duration-300 border border-green-400/50 shadow-lg hover:shadow-green-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-5 py-5 bg-lime-400 border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed -rotate-3"
             title="Refresh Data"
           >
-            <FiRefreshCw className="w-6 h-6 text-white" />
+            <FiRefreshCw className="w-6 h-6 text-black" />
           </motion.button>
         </div>
       </motion.div>
 
-      {/* LED Display Board */}
+      {/* Neo-Brutalism Display Board */}
       <motion.div 
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.1 }}
-        className="bg-gradient-to-br from-slate-800/95 to-blue-900/95 backdrop-blur-xl rounded-2xl overflow-hidden shadow-2xl border border-blue-500/30 relative z-10"
+        initial={{ opacity: 0, y: 20, rotate: 1 }}
+        animate={{ opacity: 1, y: 0, rotate: 1 }}
+        transition={{ delay: 0.15 }}
+        className="bg-white border-4 border-black shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] overflow-hidden relative z-10 rotate-1"
       >
-        {/* Header Row */}
+        {/* Header Row - Asymmetric */}
         <motion.div 
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="grid grid-cols-12 gap-6 px-8 py-5 bg-gradient-to-r from-slate-900/90 to-blue-950/90 border-b-2 border-blue-500/40"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="grid grid-cols-12 gap-3 md:gap-6 px-4 md:px-8 py-4 bg-black border-b-4 border-black"
         >
-          <div className="col-span-2 text-yellow-400 text-base font-bold tracking-wide uppercase flex items-center gap-2">
-            <FiPackage className="w-4 h-4" />
-            No. SO
+          <div className="col-span-2 text-yellow-300 text-xs md:text-base font-black tracking-wider uppercase flex items-center gap-2">
+            <FiPackage className="w-4 h-4 hidden md:block" />
+            <span className="hidden md:inline">NO. SO</span>
+            <span className="md:hidden">SO</span>
           </div>
-          <div className="col-span-2 text-yellow-400 text-base font-bold tracking-wide uppercase flex items-center gap-2">
-            <FiCalendar className="w-4 h-4" />
-            Tanggal
+          <div className="col-span-2 text-cyan-300 text-xs md:text-base font-black tracking-wider uppercase flex items-center gap-2">
+            <FiCalendar className="w-4 h-4 hidden md:block" />
+            <span className="hidden md:inline">TANGGAL</span>
+            <span className="md:hidden">TGL</span>
           </div>
-          <div className="col-span-3 text-yellow-400 text-base font-bold tracking-wide uppercase">Pelanggan</div>
-          <div className="col-span-3 text-yellow-400 text-base font-bold tracking-wide uppercase">Keterangan</div>
-          <div className="col-span-2 text-yellow-400 text-base font-bold tracking-wide uppercase text-center">Status</div>
+          <div className="col-span-3 text-lime-300 text-xs md:text-base font-black tracking-wider uppercase">
+            <span className="hidden md:inline">PELANGGAN</span>
+            <span className="md:hidden">CUST</span>
+          </div>
+          <div className="col-span-3 text-pink-300 text-xs md:text-base font-black tracking-wider uppercase hidden md:block">KETERANGAN</div>
+          <div className="col-span-2 text-orange-300 text-xs md:text-base font-black tracking-wider uppercase text-center">STATUS</div>
         </motion.div>
 
-        {/* Data Rows */}
-        <div className="max-h-[calc(100vh-280px)] overflow-y-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-slate-800">
+        {/* Data Rows - Neo-Brutalism Style */}
+        <div className="max-h-[calc(100vh-280px)] overflow-y-auto scrollbar-thin scrollbar-thumb-black scrollbar-track-gray-200">
           <AnimatePresence mode="wait">
             {salesOrders.length === 0 ? (
               <motion.div 
@@ -289,7 +271,7 @@ const SchedulePage = () => {
                   >
                     📋
                   </motion.div>
-                  <div className="text-xl text-slate-400 font-medium">Tidak ada data schedule</div>
+                  <div className="text-xl text-black font-black uppercase">Tidak ada data</div>
                 </div>
               </motion.div>
             ) : (
@@ -298,156 +280,127 @@ const SchedulePage = () => {
                 initial="hidden"
                 animate="visible"
               >
-                {salesOrders.map((so, index) => (
-                  <motion.div
-                    key={so.id}
-                    variants={itemVariants}
-                    whileHover={{ 
-                      scale: 1.02,
-                      transition: { type: "spring", stiffness: 300 }
-                    }}
-                    className="grid grid-cols-12 gap-6 px-8 py-6 border-b border-blue-900/30 hover:bg-gradient-to-r hover:from-blue-900/40 hover:to-slate-800/40 transition-all duration-300 group cursor-pointer relative overflow-hidden"
-                  >
-                    {/* Hover Effect Background */}
+                {salesOrders.map((so, index) => {
+                  // Asymmetric colors for each row
+                  const rowColors = ['bg-yellow-100', 'bg-cyan-100', 'bg-lime-100', 'bg-pink-100', 'bg-orange-100'];
+                  const bgColor = rowColors[index % rowColors.length];
+                  
+                  return (
                     <motion.div
-                      className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-blue-500/10 to-blue-500/0"
-                      initial={{ x: "-100%" }}
-                      whileHover={{ x: "100%" }}
-                      transition={{ duration: 0.6 }}
-                    />
+                      key={so.id}
+                      variants={itemVariants}
+                      whileHover={{ 
+                        scale: 1.01,
+                        x: 5,
+                        transition: { type: "spring", stiffness: 300 }
+                      }}
+                      className={`grid grid-cols-12 gap-3 md:gap-6 px-4 md:px-8 py-4 md:py-5 border-b-4 border-black ${bgColor} hover:bg-white transition-all duration-200 group cursor-pointer relative`}
+                    >
+                      {/* Nomor SO */}
+                      <div className="col-span-2 flex items-center relative z-10">
+                        <motion.div 
+                          whileHover={{ scale: 1.05, rotate: -2 }}
+                          className="bg-white px-3 py-2 border-3 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] group-hover:shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] transition-all"
+                        >
+                          <div className="text-black text-sm md:text-lg font-black tracking-tight">
+                            {so.nomor_so}
+                          </div>
+                        </motion.div>
+                      </div>
 
-                    {/* Nomor SO */}
-                    <div className="col-span-2 flex items-center relative z-10">
-                      <motion.div 
-                        whileHover={{ scale: 1.05 }}
-                        className="bg-gradient-to-r from-blue-600/20 to-blue-700/20 px-4 py-2 rounded-lg border border-blue-500/30 group-hover:border-blue-400/50 group-hover:shadow-lg group-hover:shadow-blue-500/20 transition-all"
-                      >
-                        <div className="text-white text-lg font-bold tracking-wider">
-                          {so.nomor_so}
+                      {/* Tanggal */}
+                      <div className="col-span-2 flex items-center relative z-10">
+                        <div className="flex items-center gap-1 md:gap-2">
+                          <FiCalendar className="w-3 h-3 md:w-4 md:h-4 text-black hidden md:block" />
+                          <div className="text-black text-xs md:text-base font-bold tabular-nums">
+                            {new Date(so.tanggal_so).toLocaleDateString('id-ID', {
+                              day: '2-digit',
+                              month: 'short',
+                              year: '2-digit'
+                            })}
+                          </div>
                         </div>
-                      </motion.div>
-                    </div>
+                      </div>
 
-                    {/* Tanggal */}
-                    <div className="col-span-2 flex items-center relative z-10">
-                      <div className="flex items-center gap-2">
-                        <FiCalendar className="w-4 h-4 text-yellow-400/70" />
-                        <div className="text-yellow-400 text-base font-semibold tabular-nums">
-                          {new Date(so.tanggal_so).toLocaleDateString('id-ID', {
-                            day: '2-digit',
-                            month: 'short',
-                            year: 'numeric'
-                          })}
+                      {/* Pelanggan */}
+                      <div className="col-span-3 flex items-center relative z-10">
+                        <div className="text-black text-xs md:text-base font-bold truncate uppercase">
+                          {so.nama_pelanggan}
                         </div>
                       </div>
-                    </div>
 
-                    {/* Pelanggan */}
-                    <div className="col-span-3 flex items-center relative z-10">
-                      <div className="text-white text-base font-medium truncate group-hover:text-blue-200 transition-colors">
-                        {so.nama_pelanggan}
+                      {/* Keterangan */}
+                      <div className="col-span-3 flex items-center relative z-10 hidden md:flex">
+                        <div className="text-black text-sm font-medium truncate">
+                          {so.keterangan || '-'}
+                        </div>
                       </div>
-                    </div>
 
-                    {/* Keterangan */}
-                    <div className="col-span-3 flex items-center relative z-10">
-                      <div className="text-slate-300 text-sm truncate group-hover:text-slate-200 transition-colors">
-                        {so.keterangan || '-'}
+                      {/* Status - Neo-Brutalism Badge */}
+                      <div className="col-span-2 flex items-center justify-center relative z-10">
+                        <motion.div 
+                          whileHover={{ 
+                            scale: 1.1,
+                            rotate: -3
+                          }}
+                          transition={{ duration: 0.2 }}
+                          className={`text-xs md:text-base font-black tracking-wider px-3 md:px-4 py-2 border-3 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] ${
+                            so.status === 'Terproses' ? 'bg-lime-400' :
+                            so.status === 'Sebagian Terproses' ? 'bg-yellow-400' :
+                            'bg-red-400'
+                          } flex items-center gap-1 md:gap-2 uppercase`}
+                        >
+                          <span className="hidden md:inline">{getStatusIcon(so.status)}</span>
+                          {getStatusCode(so.status)}
+                        </motion.div>
                       </div>
-                    </div>
-
-                    {/* Status */}
-                    <div className="col-span-2 flex items-center justify-center relative z-10">
-                      <motion.div 
-                        whileHover={{ 
-                          scale: 1.15,
-                          rotate: [0, -5, 5, 0]
-                        }}
-                        transition={{ duration: 0.3 }}
-                        className={`${getStatusColor(so.status)} text-base font-black tracking-widest px-5 py-2 rounded-lg border-2 ${
-                          so.status === 'Terproses' ? 'bg-green-500/20 border-green-400/50 shadow-lg shadow-green-500/30' :
-                          so.status === 'Sebagian Terproses' ? 'bg-yellow-500/20 border-yellow-400/50 shadow-lg shadow-yellow-500/30' :
-                          'bg-red-500/20 border-red-400/50 shadow-lg shadow-red-500/30'
-                        } flex items-center gap-2`}
-                      >
-                        {getStatusIcon(so.status)}
-                        {getStatusCode(so.status)}
-                      </motion.div>
-                    </div>
-                  </motion.div>
-                ))}
+                    </motion.div>
+                  );
+                })}
               </motion.div>
             )}
           </AnimatePresence>
         </div>
       </motion.div>
 
-      {/* Footer Legend */}
+      {/* Footer Legend - Neo-Brutalism */}
       <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0, y: 20, rotate: -1 }}
+        animate={{ opacity: 1, y: 0, rotate: -1 }}
         transition={{ delay: 0.2 }}
-        className="mt-8 px-8 py-6 bg-gradient-to-r from-slate-800/90 to-blue-900/90 backdrop-blur-xl rounded-2xl border border-blue-500/30 shadow-2xl relative z-10"
+        className="mt-6 px-6 py-5 bg-white border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] relative z-10 -rotate-1"
       >
-        <div className="flex items-center justify-center gap-16">
+        <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8">
           <motion.div 
-            whileHover={{ scale: 1.1, y: -5 }}
-            className="flex items-center gap-4 group cursor-default"
+            whileHover={{ scale: 1.05, rotate: 2 }}
+            className="flex items-center gap-3 group cursor-default bg-lime-400 px-4 py-3 border-3 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
           >
-            <motion.div 
-              animate={{ 
-                boxShadow: [
-                  "0 0 20px rgba(34, 197, 94, 0.5)",
-                  "0 0 30px rgba(34, 197, 94, 0.8)",
-                  "0 0 20px rgba(34, 197, 94, 0.5)"
-                ]
-              }}
-              transition={{ duration: 2, repeat: Infinity }}
-              className="w-5 h-5 rounded-full bg-gradient-to-r from-green-400 to-emerald-400 group-hover:scale-125 transition-transform"
-            />
-            <span className="text-white text-base font-semibold tracking-wide flex items-center gap-2">
-              <FiCheckCircle className="w-5 h-5 text-green-400" />
-              DONE - Terproses
+            <div className="w-6 h-6 bg-black border-2 border-black" />
+            <span className="text-black text-sm md:text-base font-black tracking-wide flex items-center gap-2 uppercase">
+              <FiCheckCircle className="w-5 h-5" />
+              DONE
             </span>
           </motion.div>
+
           <motion.div 
-            whileHover={{ scale: 1.1, y: -5 }}
-            className="flex items-center gap-4 group cursor-default"
+            whileHover={{ scale: 1.05, rotate: -2 }}
+            className="flex items-center gap-3 group cursor-default bg-yellow-400 px-4 py-3 border-3 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
           >
-            <motion.div 
-              animate={{ 
-                boxShadow: [
-                  "0 0 20px rgba(251, 191, 36, 0.5)",
-                  "0 0 30px rgba(251, 191, 36, 0.8)",
-                  "0 0 20px rgba(251, 191, 36, 0.5)"
-                ]
-              }}
-              transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
-              className="w-5 h-5 rounded-full bg-gradient-to-r from-yellow-400 to-orange-400 group-hover:scale-125 transition-transform"
-            />
-            <span className="text-white text-base font-semibold tracking-wide flex items-center gap-2">
-              <FiLoader className="w-5 h-5 text-yellow-400" />
-              PROG - Sebagian Terproses
+            <div className="w-6 h-6 bg-black border-2 border-black" />
+            <span className="text-black text-sm md:text-base font-black tracking-wide flex items-center gap-2 uppercase">
+              <FiLoader className="w-5 h-5" />
+              PROG
             </span>
           </motion.div>
+
           <motion.div 
-            whileHover={{ scale: 1.1, y: -5 }}
-            className="flex items-center gap-4 group cursor-default"
+            whileHover={{ scale: 1.05, rotate: 2 }}
+            className="flex items-center gap-3 group cursor-default bg-red-400 px-4 py-3 border-3 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
           >
-            <motion.div 
-              animate={{ 
-                boxShadow: [
-                  "0 0 20px rgba(239, 68, 68, 0.5)",
-                  "0 0 30px rgba(239, 68, 68, 0.8)",
-                  "0 0 20px rgba(239, 68, 68, 0.5)"
-                ]
-              }}
-              transition={{ duration: 2, repeat: Infinity, delay: 1 }}
-              className="w-5 h-5 rounded-full bg-gradient-to-r from-red-400 to-rose-400 group-hover:scale-125 transition-transform"
-            />
-            <span className="text-white text-base font-semibold tracking-wide flex items-center gap-2">
-              <FiAlertCircle className="w-5 h-5 text-red-400" />
-              WAIT - Menunggu Proses
+            <div className="w-6 h-6 bg-black border-2 border-black" />
+            <span className="text-black text-sm md:text-base font-black tracking-wide flex items-center gap-2 uppercase">
+              <FiAlertCircle className="w-5 h-5" />
+              WAIT
             </span>
           </motion.div>
         </div>
