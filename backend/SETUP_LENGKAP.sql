@@ -14,6 +14,7 @@ USE iware_warehouse;
 DROP TABLE IF EXISTS activity_logs;
 DROP TABLE IF EXISTS sales_orders;
 DROP TABLE IF EXISTS items;
+DROP TABLE IF EXISTS accurate_tokens;
 DROP TABLE IF EXISTS users;
 
 -- 4. Buat tabel users
@@ -70,7 +71,23 @@ CREATE TABLE activity_logs (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
--- 8. Insert superadmin
+-- 8. Buat tabel accurate_tokens
+CREATE TABLE accurate_tokens (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  user_id INT,
+  access_token TEXT NOT NULL,
+  refresh_token TEXT NOT NULL,
+  token_type VARCHAR(50) DEFAULT 'Bearer',
+  expires_in INT DEFAULT 3600,
+  expires_at DATETIME NOT NULL,
+  scope TEXT,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- 9. Insert superadmin
 -- Email: superadmin@iware.id
 -- Password: jasad666
 -- Hash generated: 2024
@@ -85,7 +102,7 @@ VALUES (
   NOW()
 );
 
--- 9. Buat indexes untuk performa
+-- 10. Buat indexes untuk performa
 CREATE INDEX idx_items_nama ON items(nama_item);
 CREATE INDEX idx_items_kode ON items(kode_item);
 CREATE INDEX idx_so_nomor ON sales_orders(nomor_so);
@@ -94,10 +111,10 @@ CREATE INDEX idx_so_status ON sales_orders(status);
 CREATE INDEX idx_logs_user ON activity_logs(user_id);
 CREATE INDEX idx_logs_created ON activity_logs(created_at);
 
--- 10. Verifikasi semua tabel
+-- 11. Verifikasi semua tabel
 SHOW TABLES;
 
--- 11. Verifikasi user superadmin
+-- 12. Verifikasi user superadmin
 SELECT 
   id,
   nama,
@@ -116,6 +133,7 @@ FROM users;
 -- - items
 -- - sales_orders
 -- - activity_logs
+-- - accurate_tokens
 --
 -- User superadmin:
 -- - id: 1
