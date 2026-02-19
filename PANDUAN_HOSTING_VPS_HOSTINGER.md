@@ -230,7 +230,7 @@ PORT=5000
 NODE_ENV=production
 
 # Database Configuration
-DB_HOST=localhost
+DB_HOST=127.0.0.1
 DB_USER=iware_user
 DB_PASSWORD=PASSWORD_DATABASE_ANDA
 DB_NAME=iware_warehouse
@@ -262,13 +262,49 @@ openssl rand -base64 32
 
 ### 5.3 Import Database Schema
 
+**Metode 1: Import Manual (Recommended)**
+
 ```bash
 cd /var/www/iware/backend
 
-# Import schema
+# Import schema langsung
 mysql -u iware_user -p iware_warehouse < SETUP_LENGKAP.sql
+# Masukkan password database saat diminta
+```
 
-# Atau jalankan setup script
+**Metode 2: Menggunakan Import Script (Recommended)**
+
+```bash
+cd /var/www/iware/backend
+
+# Jalankan script import yang lebih robust
+npm run import-db
+```
+
+Script ini akan:
+- Otomatis handle koneksi IPv4/IPv6
+- Menampilkan progress import
+- Verifikasi tabel yang berhasil dibuat
+- Memberikan error message yang jelas
+
+**Metode 3: Menggunakan Setup Script**
+
+Jika `npm run setup` error dengan `ECONNREFUSED`, pastikan:
+
+```bash
+# 1. Check MySQL berjalan
+systemctl status mysql
+
+# 2. Update .env untuk force IPv4
+nano .env
+
+# Pastikan DB_HOST menggunakan 127.0.0.1 bukan localhost:
+DB_HOST=127.0.0.1
+
+# 3. Test koneksi MySQL
+mysql -u iware_user -p -h 127.0.0.1 iware_warehouse
+
+# 4. Jalankan setup
 npm run setup
 ```
 
@@ -564,6 +600,8 @@ node scripts/testLogin.js
 
 ## 11. Maintenance & Troubleshooting
 
+**📖 Untuk troubleshooting lengkap, lihat file [TROUBLESHOOTING.md](TROUBLESHOOTING.md)**
+
 ### 11.1 Monitoring Aplikasi
 
 ```bash
@@ -633,6 +671,41 @@ crontab -e
 
 #### ❌ Backend tidak bisa connect ke database
 
+**Error: `ECONNREFUSED ::1:3306`**
+
+Ini terjadi karena Node.js mencoba connect ke MySQL via IPv6 tapi MySQL hanya listen di IPv4.
+
+**Solusi:**
+
+```bash
+# 1. Update .env file
+nano /var/www/iware/backend/.env
+
+# Ganti DB_HOST dari localhost ke 127.0.0.1:
+DB_HOST=127.0.0.1
+
+# 2. Test koneksi MySQL
+mysql -u iware_user -p -h 127.0.0.1 iware_warehouse
+
+# 3. Restart backend
+pm2 restart iware-backend
+```
+
+**Atau konfigurasi MySQL untuk listen di IPv6:**
+
+```bash
+# Edit MySQL config
+nano /etc/mysql/mysql.conf.d/mysqld.cnf
+
+# Pastikan bind-address adalah:
+bind-address = 0.0.0.0
+
+# Restart MySQL
+systemctl restart mysql
+```
+
+**Error: `Access denied for user`**
+
 ```bash
 # Check MySQL status
 systemctl status mysql
@@ -640,8 +713,14 @@ systemctl status mysql
 # Check database credentials
 mysql -u iware_user -p iware_warehouse
 
-# Check .env file
-cat /var/www/iware/backend/.env
+# Reset password jika perlu
+mysql -u root -p
+# Kemudian:
+ALTER USER 'iware_user'@'localhost' IDENTIFIED BY 'PASSWORD_BARU';
+FLUSH PRIVILEGES;
+
+# Update .env file
+nano /var/www/iware/backend/.env
 ```
 
 #### ❌ Accurate API error 401 (Unauthorized)
@@ -738,6 +817,21 @@ pm2 list
 
 # View real-time logs
 pm2 logs --lines 100
+
+# Import database (jika npm run setup gagal)
+cd /var/www/iware/backend
+npm run import-db
+
+# Test MySQL connection
+mysql -u iware_user -p -h 127.0.0.1 iware_warehouse
+
+# Check MySQL is running
+systemctl status mysql
+
+# Restart all services
+pm2 restart all
+systemctl restart nginx
+systemctl restart mysql
 ```
 
 ---
