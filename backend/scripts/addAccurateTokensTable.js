@@ -1,11 +1,22 @@
-const { pool } = require('../config/database');
+const mysql = require('mysql2/promise');
+require('dotenv').config();
 
 async function addAccurateTokensTable() {
+  let connection;
+  
   try {
     console.log('🔄 Menambahkan tabel accurate_tokens...');
 
+    // Create connection
+    connection = await mysql.createConnection({
+      host: process.env.DB_HOST || '127.0.0.1',
+      user: process.env.DB_USER || 'root',
+      password: process.env.DB_PASSWORD || '',
+      database: process.env.DB_NAME || 'iware_warehouse'
+    });
+
     // Cek apakah tabel sudah ada
-    const [tables] = await pool.query(
+    const [tables] = await connection.query(
       "SHOW TABLES LIKE 'accurate_tokens'"
     );
 
@@ -15,12 +26,12 @@ async function addAccurateTokensTable() {
     }
 
     // Buat tabel accurate_tokens
-    await pool.query(`
+    await connection.query(`
       CREATE TABLE accurate_tokens (
         id INT PRIMARY KEY AUTO_INCREMENT,
         user_id INT NOT NULL,
         access_token TEXT NOT NULL,
-        refresh_token TEXT NOT NULL,
+        refresh_token TEXT,
         token_type VARCHAR(50) DEFAULT 'Bearer',
         expires_in INT DEFAULT 3600,
         expires_at DATETIME NOT NULL,
@@ -47,9 +58,18 @@ async function addAccurateTokensTable() {
 
   } catch (error) {
     console.error('❌ Error:', error.message);
+    
+    if (error.code === 'ER_NO_REFERENCED_ROW_2' || error.message.includes('foreign key')) {
+      console.error('');
+      console.error('⚠️  Tabel users belum ada atau kosong!');
+      console.error('Jalankan: npm run setup-interactive');
+    }
+    
     throw error;
   } finally {
-    await pool.end();
+    if (connection) {
+      await connection.end();
+    }
   }
 }
 

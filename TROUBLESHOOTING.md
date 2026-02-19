@@ -221,7 +221,28 @@ pm2 restart iware-backend
 
 # 5. Test koneksi
 cd /var/www/iware/backend
-node scripts/testAccurateConnection.js
+npm run test-accurate
+```
+
+---
+
+## ❌ Table 'accurate_tokens' NOT FOUND
+
+**Masalah:** Tabel accurate_tokens belum dibuat.
+
+**Solusi:**
+
+```bash
+cd /var/www/iware/backend
+
+# Buat tabel accurate_tokens
+npm run add-accurate-table
+
+# Verifikasi
+npm run test-accurate
+
+# Harus menampilkan:
+# ✓ Table accurate_tokens found
 ```
 
 ---

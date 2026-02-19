@@ -120,6 +120,19 @@ CORS_ORIGIN=https://DOMAIN_ANDA.com
 
 Save: `Ctrl+O`, Enter, `Ctrl+X`
 
+**Test koneksi Accurate:**
+
+```bash
+# Test Accurate API
+npm run test-accurate
+
+# Jika tabel accurate_tokens tidak ada:
+npm run add-accurate-table
+
+# Test lagi
+npm run test-accurate
+```
+
 ### 7. Setup Frontend (3 menit)
 
 ```bash

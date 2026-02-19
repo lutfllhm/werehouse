@@ -354,14 +354,25 @@ npm run build
 cd /var/www/iware/backend
 
 # Test koneksi Accurate
-node scripts/testAccurateConnection.js
+npm run test-accurate
 ```
 
 **Output yang diharapkan:**
 ```
+✓ Environment variables loaded
+✓ Database connected
+✓ Table accurate_tokens found
 ✓ Koneksi ke Accurate Online berhasil!
-✓ Database ID: 118078
-✓ Token valid
+```
+
+**Jika tabel `accurate_tokens` tidak ditemukan:**
+
+```bash
+# Buat tabel accurate_tokens
+npm run add-accurate-table
+
+# Test lagi
+npm run test-accurate
 ```
 
 ### 6.2 Setup Accurate Tokens Table
