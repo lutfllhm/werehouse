@@ -262,7 +262,65 @@ ACCURATE_DATABASE_ID=your_db_id_here
 
 ## 🚀 Deployment ke VPS
 
-### 🐳 Deployment dengan Docker (RECOMMENDED)
+### 🌟 Deployment ke VPS Hostinger (RECOMMENDED)
+
+**⭐ PANDUAN LENGKAP KHUSUS HOSTINGER:**
+
+Panduan lengkap untuk hosting ke VPS Hostinger dengan Accurate Token yang sudah ada!
+
+**📘 Dokumentasi Utama:**
+- **[PANDUAN_HOSTING_VPS_HOSTINGER_LENGKAP.md](PANDUAN_HOSTING_VPS_HOSTINGER_LENGKAP.md)** - Panduan ALL-IN-ONE (70 halaman)
+  - ✅ Setup VPS dari NOL sampai ONLINE (45-60 menit)
+  - ✅ Konfigurasi Accurate Token (sudah ada token)
+  - ✅ **CARA HAPUS APLIKASI LENGKAP**
+  - ✅ Troubleshooting 12 masalah umum
+
+**📜 Tools & Scripts:**
+- **[deploy-vps-hostinger.sh](deploy-vps-hostinger.sh)** - Script deployment otomatis dengan menu (20-30 menit)
+- **[uninstall-iware.sh](uninstall-iware.sh)** - Script hapus aplikasi dengan backup otomatis (5-10 menit)
+
+**📋 Quick Reference:**
+- **[QUICK_REFERENCE_HOSTINGER.md](QUICK_REFERENCE_HOSTINGER.md)** - Command & troubleshooting (bisa print)
+- **[RINGKASAN_DEPLOYMENT_HOSTINGER.md](RINGKASAN_DEPLOYMENT_HOSTINGER.md)** - Ringkasan visual 1 halaman
+- **[README_DEPLOYMENT_HOSTINGER.md](README_DEPLOYMENT_HOSTINGER.md)** - Index lengkap semua dokumentasi
+
+**⚡ Quick Deploy dengan Script:**
+```bash
+# 1. Upload script ke VPS
+scp deploy-vps-hostinger.sh root@IP_VPS:/root/
+
+# 2. SSH ke VPS
+ssh root@IP_VPS
+
+# 3. Jalankan script
+chmod +x deploy-vps-hostinger.sh
+./deploy-vps-hostinger.sh
+
+# 4. Pilih "7) Full Deployment"
+# 5. Ikuti wizard
+# 6. Selesai dalam 20-30 menit!
+```
+
+**🗑️ Hapus Aplikasi:**
+```bash
+# Otomatis dengan script (RECOMMENDED)
+chmod +x uninstall-iware.sh
+./uninstall-iware.sh
+
+# Atau lihat panduan manual di PANDUAN_HOSTING_VPS_HOSTINGER_LENGKAP.md
+```
+
+**Keuntungan Deployment Hostinger:**
+- ✅ Panduan khusus untuk VPS Hostinger
+- ✅ Sudah termasuk konfigurasi Accurate Token
+- ✅ Script otomatis untuk deploy & uninstall
+- ✅ Dokumentasi lengkap 70+ halaman
+- ✅ Quick reference untuk maintenance
+- ✅ Cara hapus aplikasi yang aman
+
+---
+
+### 🐳 Deployment dengan Docker (Alternative)
 
 **⭐ PANDUAN LENGKAP ALL-IN-ONE:**
 - **[📘 PANDUAN LENGKAP HOSTING VPS](PANDUAN_LENGKAP_HOSTING_VPS.md)** - Panduan SATU FILE dari NOL sampai ONLINE! (30-45 menit)
@@ -300,9 +358,9 @@ docker compose up -d
 
 ---
 
-### Hosting Manual ke VPS Hostinger
+### Hosting Manual ke VPS (Generic)
 
-Jika tidak ingin menggunakan Docker, tersedia panduan manual lengkap.
+Jika tidak ingin menggunakan Docker atau Hostinger, tersedia panduan manual lengkap.
 
 **⭐ MULAI DISINI:** [README_DEPLOYMENT.md](README_DEPLOYMENT.md)
 
