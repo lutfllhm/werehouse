@@ -9,6 +9,7 @@
     "setup": "node scripts/setupDatabase.js",
     "setup-interactive": "node scripts/setupDatabaseInteractive.js",
     "import-db": "node scripts/importDatabase.js",
+    "check-db": "node scripts/checkDatabase.js",
     "verify": "node scripts/verifySetup.js",
     "test-login": "node scripts/testLogin.js",
     "generate-password": "node scripts/generatePassword.js",

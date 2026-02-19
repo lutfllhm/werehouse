@@ -292,6 +292,30 @@ Database Username [iware_user]: (tekan Enter)
 Database Password: (buat password yang kuat)
 ```
 
+**⚠️ PENTING:** Beberapa warning seperti "Unknown column 'username'" adalah NORMAL dan bisa diabaikan. Yang penting adalah tabel berhasil dibuat.
+
+**Verifikasi database berhasil:**
+
+```bash
+# Check database
+npm run check-db
+
+# Harus menampilkan:
+# ✓ Found 5 tables:
+#   users
+#   items
+#   sales_orders
+#   activity_logs
+#   accurate_tokens
+```
+
+**Jika tidak ada user superadmin:**
+
+```bash
+# Fix login dan buat user superadmin
+npm run fix-login
+```
+
 **Metode 2: Import Manual**
 
 Jika Anda sudah membuat database dan user secara manual:
@@ -301,25 +325,9 @@ cd /var/www/iware/backend
 
 # Import schema langsung
 mysql -u iware_user -p -h 127.0.0.1 iware_warehouse < SETUP_LENGKAP.sql
-# Masukkan password database saat diminta
-```
 
-**Metode 3: Menggunakan Import Script**
-
-```bash
-cd /var/www/iware/backend
-
-# Pastikan .env sudah diisi dengan benar
-nano .env
-
-# Update konfigurasi:
-DB_HOST=127.0.0.1
-DB_USER=iware_user
-DB_PASSWORD=PASSWORD_ANDA
-DB_NAME=iware_warehouse
-
-# Jalankan import
-npm run import-db
+# Check hasilnya
+npm run check-db
 ```
 
 ### 5.4 Setup Frontend

@@ -77,18 +77,27 @@ async function importDatabase() {
     
     log.info(`Mengeksekusi ${statements.length} SQL statements...`);
     
+    let successCount = 0;
+    let errorCount = 0;
+    
     // Execute each statement
     for (let i = 0; i < statements.length; i++) {
       const statement = statements[i];
       if (statement) {
         try {
           await connection.query(statement);
-          process.stdout.write(`\rProgress: ${i + 1}/${statements.length}`);
+          successCount++;
+          process.stdout.write(`\rProgress: ${i + 1}/${statements.length} (✓ ${successCount}, ✗ ${errorCount})`);
         } catch (err) {
-          // Ignore errors for DROP TABLE IF EXISTS, etc.
-          if (!err.message.includes('already exists') && 
-              !err.message.includes('Unknown table')) {
-            log.warning(`Warning pada statement ${i + 1}: ${err.message}`);
+          // Ignore expected errors
+          if (err.message.includes('already exists') || 
+              err.message.includes('Unknown table') ||
+              err.message.includes('Duplicate key') ||
+              err.message.includes('Unknown column')) {
+            // Skip these errors silently
+          } else {
+            errorCount++;
+            process.stdout.write(`\rProgress: ${i + 1}/${statements.length} (✓ ${successCount}, ✗ ${errorCount})`);
           }
         }
       }

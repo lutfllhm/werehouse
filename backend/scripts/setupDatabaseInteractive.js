@@ -141,15 +141,23 @@ async function setupDatabase() {
       .map(s => s.trim())
       .filter(s => s.length > 0 && !s.startsWith('--'));
     
+    let successCount = 0;
+    let errorCount = 0;
+    
     for (let i = 0; i < statements.length; i++) {
       const statement = statements[i];
       if (statement) {
         try {
           await userConnection.query(statement);
-          process.stdout.write(`\rProgress: ${i + 1}/${statements.length}`);
+          successCount++;
+          process.stdout.write(`\rProgress: ${i + 1}/${statements.length} (✓ ${successCount})`);
         } catch (err) {
+          // Ignore expected errors
           if (!err.message.includes('already exists') && 
-              !err.message.includes('Unknown table')) {
+              !err.message.includes('Unknown table') &&
+              !err.message.includes('Duplicate key') &&
+              !err.message.includes('Unknown column')) {
+            errorCount++;
             log.warning(`\nWarning pada statement ${i + 1}: ${err.message}`);
           }
         }

@@ -89,6 +89,21 @@ Script akan otomatis:
 ✓ Import schema
 ✓ Update .env
 
+**Verifikasi:**
+
+```bash
+# Check database berhasil
+npm run check-db
+
+# Harus menampilkan 5 tabel dan minimal 1 user
+```
+
+**Jika tidak ada user:**
+
+```bash
+npm run fix-login
+```
+
 ### 6. Update Konfigurasi Accurate (2 menit)
 
 ```bash
