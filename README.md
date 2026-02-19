@@ -211,9 +211,17 @@ iware-warehouse/
 - **[Accurate Integration](ACCURATE_INTEGRATION.md)** - Panduan integrasi Accurate Online
 
 ### Dokumentasi Hosting VPS
-- **[⚡ Quick Start VPS](QUICK_START_VPS.md)** - Deploy ke VPS dalam 30 menit
-- **[📘 Panduan Lengkap Hosting](PANDUAN_HOSTING_VPS_HOSTINGER.md)** - Panduan detail hosting di VPS Hostinger
-- **[🔧 Troubleshooting](TROUBLESHOOTING.md)** - Solusi masalah umum deployment
+
+**🐳 Deployment dengan Docker (RECOMMENDED):**
+- **[⚡ Quick Start Docker](QUICK_START_DOCKER.md)** - Deploy dengan Docker dalam 20 menit
+- **[📘 Panduan Docker Lengkap](PANDUAN_DOCKER_HOSTINGER.md)** - Panduan detail Docker deployment di VPS Hostinger
+- **[🔧 Troubleshooting Docker](TROUBLESHOOTING_DOCKER.md)** - Solusi masalah Docker deployment
+
+**📦 Deployment Manual (Tanpa Docker):**
+- **[⚡ Quick Start VPS](QUICK_START_VPS.md)** - Deploy manual dalam 30 menit
+- **[📘 Panduan Lengkap Hosting](PANDUAN_HOSTING_VPS_HOSTINGER.md)** - Panduan detail hosting manual di VPS Hostinger
+- **[🔧 Troubleshooting](TROUBLESHOOTING.md)** - Solusi masalah deployment manual
+- **[📋 VPS Commands](VPS_TROUBLESHOOTING_COMMANDS.md)** - Cheatsheet command troubleshooting
 
 ### Backend Scripts
 ```bash
