@@ -162,33 +162,36 @@ apt install -y certbot python3-certbot-nginx
 
 ## 4. Setup Database MySQL
 
-### 4.1 Login ke MySQL
+### 4.1 Install dan Secure MySQL
 
 ```bash
-mysql -u root -p
-# Masukkan password root MySQL
+# MySQL sudah terinstall dari langkah sebelumnya
+# Jalankan secure installation
+mysql_secure_installation
 ```
 
-### 4.2 Buat Database dan User
+**Jawab pertanyaan berikut:**
+- Set root password: **YES** (buat password yang kuat, catat password ini!)
+- Remove anonymous users: **YES**
+- Disallow root login remotely: **YES**
+- Remove test database: **YES**
+- Reload privilege tables: **YES**
 
-```sql
--- Buat database
-CREATE DATABASE iware_warehouse CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+### 4.2 Verifikasi MySQL Berjalan
 
--- Buat user
-CREATE USER 'iware_user'@'localhost' IDENTIFIED BY 'PASSWORD_ANDA_YANG_KUAT';
+```bash
+# Check MySQL status
+systemctl status mysql
 
--- Berikan privileges
-GRANT ALL PRIVILEGES ON iware_warehouse.* TO 'iware_user'@'localhost';
-
--- Reload privileges
-FLUSH PRIVILEGES;
-
--- Exit
-EXIT;
+# Test login
+mysql -u root -p -h 127.0.0.1
+# Masukkan password root yang baru dibuat
+# Ketik EXIT; untuk keluar
 ```
 
-**⚠️ PENTING:** Ganti `PASSWORD_ANDA_YANG_KUAT` dengan password yang kuat!
+**⚠️ PENTING:** Catat password root MySQL, Anda akan membutuhkannya di langkah selanjutnya!
+
+**Note:** Database dan user akan dibuat otomatis menggunakan script interaktif di langkah 5.3
 
 ---
 
@@ -262,50 +265,61 @@ openssl rand -base64 32
 
 ### 5.3 Import Database Schema
 
-**Metode 1: Import Manual (Recommended)**
+**Metode 1: Setup Interaktif (PALING MUDAH - RECOMMENDED)**
+
+```bash
+cd /var/www/iware/backend
+
+# Jalankan setup interaktif
+npm run setup-interactive
+```
+
+Script ini akan:
+- Meminta kredensial MySQL root
+- Membuat database otomatis
+- Membuat user database otomatis
+- Import schema otomatis
+- Update file .env otomatis
+
+**Jawab pertanyaan berikut:**
+```
+MySQL Host [127.0.0.1]: (tekan Enter)
+MySQL Root Username [root]: (tekan Enter)
+MySQL Root Password: (masukkan password root MySQL)
+
+Nama Database [iware_warehouse]: (tekan Enter)
+Database Username [iware_user]: (tekan Enter)
+Database Password: (buat password yang kuat)
+```
+
+**Metode 2: Import Manual**
+
+Jika Anda sudah membuat database dan user secara manual:
 
 ```bash
 cd /var/www/iware/backend
 
 # Import schema langsung
-mysql -u iware_user -p iware_warehouse < SETUP_LENGKAP.sql
+mysql -u iware_user -p -h 127.0.0.1 iware_warehouse < SETUP_LENGKAP.sql
 # Masukkan password database saat diminta
 ```
 
-**Metode 2: Menggunakan Import Script (Recommended)**
+**Metode 3: Menggunakan Import Script**
 
 ```bash
 cd /var/www/iware/backend
 
-# Jalankan script import yang lebih robust
-npm run import-db
-```
-
-Script ini akan:
-- Otomatis handle koneksi IPv4/IPv6
-- Menampilkan progress import
-- Verifikasi tabel yang berhasil dibuat
-- Memberikan error message yang jelas
-
-**Metode 3: Menggunakan Setup Script**
-
-Jika `npm run setup` error dengan `ECONNREFUSED`, pastikan:
-
-```bash
-# 1. Check MySQL berjalan
-systemctl status mysql
-
-# 2. Update .env untuk force IPv4
+# Pastikan .env sudah diisi dengan benar
 nano .env
 
-# Pastikan DB_HOST menggunakan 127.0.0.1 bukan localhost:
+# Update konfigurasi:
 DB_HOST=127.0.0.1
+DB_USER=iware_user
+DB_PASSWORD=PASSWORD_ANDA
+DB_NAME=iware_warehouse
 
-# 3. Test koneksi MySQL
-mysql -u iware_user -p -h 127.0.0.1 iware_warehouse
-
-# 4. Jalankan setup
-npm run setup
+# Jalankan import
+npm run import-db
 ```
 
 ### 5.4 Setup Frontend

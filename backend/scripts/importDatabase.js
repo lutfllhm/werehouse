@@ -41,6 +41,18 @@ async function importDatabase() {
       charset: 'utf8mb4'
     };
     
+    // Validasi konfigurasi
+    log.info('Konfigurasi database:');
+    log.info(`  Host: ${config.host}`);
+    log.info(`  User: ${config.user}`);
+    log.info(`  Database: ${config.database}`);
+    log.info(`  Password: ${config.password ? '***' + config.password.slice(-3) : '(kosong)'}`);
+    
+    if (!config.password) {
+      log.warning('Password database kosong!');
+      log.warning('Jika Anda sudah set password MySQL, update file .env');
+    }
+    
     log.info(`Connecting to MySQL at ${config.host}...`);
     
     // Buat koneksi

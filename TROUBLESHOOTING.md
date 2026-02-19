@@ -4,29 +4,52 @@ Panduan cepat untuk mengatasi masalah umum saat deployment.
 
 ---
 
-## ❌ Error: `ECONNREFUSED ::1:3306`
+## ❌ Error: `ECONNREFUSED ::1:3306` atau `Access denied`
 
-**Masalah:** Node.js tidak bisa connect ke MySQL karena mencoba menggunakan IPv6.
+**Masalah:** Node.js tidak bisa connect ke MySQL.
 
-**Solusi Cepat:**
+**Solusi Termudah - Gunakan Setup Interaktif:**
 
 ```bash
-# 1. Edit file .env
+cd /var/www/iware/backend
+
+# Jalankan setup interaktif yang akan handle semuanya
+npm run setup-interactive
+
+# Ikuti instruksi di layar
+# Script akan otomatis:
+# - Membuat database
+# - Membuat user
+# - Import schema
+# - Update .env
+```
+
+**Solusi Manual:**
+
+```bash
+# 1. Pastikan MySQL berjalan
+systemctl status mysql
+
+# 2. Test koneksi MySQL dengan root
+mysql -u root -p -h 127.0.0.1
+
+# 3. Buat database dan user (di MySQL prompt):
+CREATE DATABASE IF NOT EXISTS iware_warehouse CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER IF NOT EXISTS 'iware_user'@'localhost' IDENTIFIED BY 'PASSWORD_KUAT';
+GRANT ALL PRIVILEGES ON iware_warehouse.* TO 'iware_user'@'localhost';
+FLUSH PRIVILEGES;
+EXIT;
+
+# 4. Update .env
 nano /var/www/iware/backend/.env
 
-# 2. Ganti baris ini:
-DB_HOST=localhost
-
-# Menjadi:
+# Pastikan konfigurasi berikut:
 DB_HOST=127.0.0.1
+DB_USER=iware_user
+DB_PASSWORD=PASSWORD_KUAT
+DB_NAME=iware_warehouse
 
-# 3. Save (Ctrl+O, Enter, Ctrl+X)
-
-# 4. Test koneksi
-mysql -u iware_user -p -h 127.0.0.1 iware_warehouse
-
-# 5. Import database dengan script baru
-cd /var/www/iware/backend
+# 5. Import database
 npm run import-db
 
 # 6. Restart backend

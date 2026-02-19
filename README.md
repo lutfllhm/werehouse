@@ -210,11 +210,18 @@ iware-warehouse/
 - **[Project Structure](PROJECT_STRUCTURE.md)** - Struktur project detail
 - **[Accurate Integration](ACCURATE_INTEGRATION.md)** - Panduan integrasi Accurate Online
 
+### Dokumentasi Hosting VPS
+- **[⚡ Quick Start VPS](QUICK_START_VPS.md)** - Deploy ke VPS dalam 30 menit
+- **[📘 Panduan Lengkap Hosting](PANDUAN_HOSTING_VPS_HOSTINGER.md)** - Panduan detail hosting di VPS Hostinger
+- **[🔧 Troubleshooting](TROUBLESHOOTING.md)** - Solusi masalah umum deployment
+
 ### Backend Scripts
 ```bash
-npm run verify      # Verifikasi setup
-npm run test-login  # Test login otomatis
-npm run dev         # Jalankan server
+npm run setup-interactive  # Setup database interaktif (RECOMMENDED)
+npm run import-db         # Import database schema
+npm run verify            # Verifikasi setup
+npm run test-login        # Test login otomatis
+npm run dev               # Jalankan server
 ```
 
 ## 🔧 Konfigurasi Accurate Online
