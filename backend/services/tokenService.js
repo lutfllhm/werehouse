@@ -45,6 +45,8 @@ class TokenService {
   // Ambil token aktif untuk user
   async getActiveToken(userId) {
     try {
+      console.log('Getting active token for userId:', userId);
+      
       const [tokens] = await pool.query(
         `SELECT * FROM accurate_tokens 
          WHERE user_id = ? AND is_active = TRUE 
@@ -53,10 +55,13 @@ class TokenService {
         [userId]
       );
 
+      console.log('Tokens found:', tokens.length);
+
       if (tokens.length === 0) {
+        console.log('No active token found for user');
         return {
           success: false,
-          message: 'Token tidak ditemukan'
+          message: 'Token tidak ditemukan. Silakan hubungkan akun Accurate terlebih dahulu.'
         };
       }
 
@@ -66,15 +71,23 @@ class TokenService {
       const now = new Date();
       const expiresAt = new Date(token.expires_at);
 
+      console.log('Token expiry check:', {
+        now: now.toISOString(),
+        expiresAt: expiresAt.toISOString(),
+        isExpired: now >= expiresAt
+      });
+
       if (now >= expiresAt) {
+        console.log('Token expired, needs refresh');
         return {
           success: false,
-          message: 'Token sudah expired',
+          message: 'Token sudah expired. Silakan refresh token atau hubungkan ulang akun Accurate.',
           needsRefresh: true,
           refreshToken: token.refresh_token
         };
       }
 
+      console.log('Token is valid');
       return {
         success: true,
         token: {

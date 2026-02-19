@@ -36,11 +36,13 @@ const SalesOrdersPage = () => {
   const handleSync = async () => {
     setSyncing(true);
     try {
-      await api.post('/sales-orders/sync');
-      toast.success('Sinkronisasi berhasil');
+      const response = await api.post('/sales-orders/sync');
+      toast.success(response.data.pesan || 'Sinkronisasi berhasil');
       loadSalesOrders();
     } catch (error) {
-      toast.error('Sinkronisasi gagal');
+      console.error('Sync error:', error);
+      const errorMsg = error.response?.data?.pesan || error.response?.data?.error || 'Sinkronisasi gagal';
+      toast.error(errorMsg);
     } finally {
       setSyncing(false);
     }

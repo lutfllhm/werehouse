@@ -349,7 +349,18 @@ class AccurateService {
   // Ambil data sales orders dari Accurate Online
   async getSalesOrders(userId, params = {}) {
     try {
+      console.log('Getting sales orders for userId:', userId);
+      
       const headers = await this.getHeaders(userId);
+      
+      console.log('Request to Accurate API:', {
+        url: `${this.baseURL}/sales-order/list.do`,
+        params: {
+          sp: params.page || 1,
+          pageSize: params.pageSize || 100,
+          ...params
+        }
+      });
       
       // Menggunakan endpoint /list.do sesuai API Accurate
       const response = await axios.get(`${this.baseURL}/sales-order/list.do`, {
@@ -361,16 +372,26 @@ class AccurateService {
         }
       });
 
+      console.log('Accurate API response status:', response.status);
+      console.log('Accurate API response data keys:', Object.keys(response.data));
+
       return {
         sukses: true,
         data: response.data
       };
     } catch (error) {
-      console.error('Error mengambil data sales orders dari Accurate:', error.message);
+      console.error('Error mengambil data sales orders dari Accurate:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+      
       return {
         sukses: false,
-        pesan: error.response?.data?.message || 'Gagal mengambil data sales orders',
-        error: error.message
+        pesan: error.response?.data?.message || error.response?.data?.error || 'Gagal mengambil data sales orders',
+        error: error.message,
+        statusCode: error.response?.status,
+        detail: error.response?.data
       };
     }
   }

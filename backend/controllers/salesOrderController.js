@@ -5,20 +5,39 @@ const accurateService = require('../services/accurateService');
 exports.syncSalesOrders = async (req, res) => {
   try {
     const userId = req.userData.userId;
+    
+    console.log('Starting sync sales orders for user:', userId);
+    
     const result = await accurateService.getSalesOrders(userId, { pageSize: 500 });
 
+    console.log('Accurate API result:', { sukses: result.sukses, pesan: result.pesan });
+
     if (!result.sukses) {
+      console.error('Failed to get data from Accurate:', result.pesan, result.error);
       return res.status(500).json({
         sukses: false,
-        pesan: 'Gagal mengambil data dari Accurate Online',
-        error: result.pesan
+        pesan: result.pesan || 'Gagal mengambil data dari Accurate Online',
+        error: result.error,
+        detail: 'Pastikan token Accurate masih valid dan database ID sudah benar'
       });
     }
 
     // Response dari Accurate biasanya dalam format { d: [...], sp: {...} }
     const salesOrders = result.data.d || result.data || [];
+    
+    console.log('Sales orders received:', salesOrders.length);
+    
+    if (salesOrders.length === 0) {
+      return res.json({
+        sukses: true,
+        pesan: 'Tidak ada sales orders untuk disinkronkan',
+        data: { total: 0, errors: 0, totalData: 0 }
+      });
+    }
+
     let syncCount = 0;
     let errorCount = 0;
+    const errors = [];
 
     for (const so of salesOrders) {
       try {
@@ -59,6 +78,7 @@ exports.syncSalesOrders = async (req, res) => {
         syncCount++;
       } catch (soError) {
         console.error('Error sync SO:', soError.message);
+        errors.push({ so: so.number || so.id, error: soError.message });
         errorCount++;
       }
     }
@@ -75,7 +95,8 @@ exports.syncSalesOrders = async (req, res) => {
       data: { 
         total: syncCount,
         errors: errorCount,
-        totalData: salesOrders.length
+        totalData: salesOrders.length,
+        errorDetails: errors.length > 0 ? errors : undefined
       }
     });
   } catch (error) {
@@ -83,7 +104,8 @@ exports.syncSalesOrders = async (req, res) => {
     res.status(500).json({
       sukses: false,
       pesan: 'Terjadi kesalahan saat sinkronisasi sales orders',
-      error: error.message
+      error: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   }
 };
