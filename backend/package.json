@@ -11,6 +11,7 @@
     "import-db": "node scripts/importDatabase.js",
     "check-db": "node scripts/checkDatabase.js",
     "add-accurate-table": "node scripts/addAccurateTokensTable.js",
+    "diagnose": "node scripts/diagnoseDeployment.js",
     "verify": "node scripts/verifySetup.js",
     "test-login": "node scripts/testLogin.js",
     "test-accurate": "node scripts/testAccurateConnection.js",

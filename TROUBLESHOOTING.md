@@ -172,29 +172,71 @@ systemctl reload nginx
 
 ---
 
-## ❌ Error 502 Bad Gateway
+## ❌ Error 500 Internal Server Error atau 502 Bad Gateway
 
-**Masalah:** Nginx tidak bisa connect ke backend.
+**Masalah:** Website menampilkan error 500/502 - Nginx tidak bisa connect ke backend atau ada error di aplikasi.
 
-**Solusi:**
+**Diagnostic Otomatis (RECOMMENDED):**
+
+```bash
+cd /var/www/iware/backend
+
+# Jalankan diagnostic script
+npm run diagnose
+
+# Script akan check:
+# ✓ Backend running?
+# ✓ Frontend built?
+# ✓ Nginx configured?
+# ✓ Environment variables set?
+```
+
+**Solusi Manual:**
 
 ```bash
 # 1. Check backend running
 pm2 status
 
-# 2. Check backend listening on correct port
+# Jika tidak running atau error:
+cd /var/www/iware/backend
+pm2 delete iware-backend
+pm2 start ecosystem.config.js
+pm2 save
+
+# 2. Check backend logs untuk error
+pm2 logs iware-backend --lines 50
+
+# 3. Test backend langsung
+curl http://localhost:5000/api/health
+
+# Harus return: {"status":"ok","timestamp":"..."}
+# Jika error, check logs di step 2
+
+# 4. Check frontend sudah di-build
+ls -la /var/www/iware/frontend/dist/
+
+# Jika kosong atau tidak ada:
+cd /var/www/iware/frontend
+npm install
+npm run build
+
+# 5. Check Nginx error log
+tail -50 /var/log/nginx/error.log
+tail -50 /var/log/nginx/iware-error.log
+
+# 6. Check Nginx config
+nginx -t
+
+# Jika error, perbaiki config:
+nano /etc/nginx/sites-available/iware
+
+# 7. Reload Nginx
+systemctl reload nginx
+
+# 8. Check port 5000 listening
 netstat -tulpn | grep 5000
 
-# 3. Check backend logs
-pm2 logs iware-backend
-
-# 4. Restart backend
-pm2 restart iware-backend
-
-# 5. Check Nginx proxy settings
-cat /etc/nginx/sites-available/iware | grep proxy_pass
-
-# Should be: proxy_pass http://localhost:5000;
+# Harus ada: tcp 0.0.0.0:5000 ... node
 ```
 
 ---
