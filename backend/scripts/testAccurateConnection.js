@@ -1,4 +1,17 @@
-require('dotenv').config();
+const path = require('path');
+const fs = require('fs');
+
+// Load .env file
+const envPath = path.join(__dirname, '../.env');
+if (fs.existsSync(envPath)) {
+  require('dotenv').config({ path: envPath });
+  console.log('✓ Loaded .env from:', envPath);
+} else {
+  console.log('⚠ .env file not found at:', envPath);
+  console.log('  Please create backend/.env file');
+  process.exit(1);
+}
+
 const axios = require('axios');
 const { pool } = require('../config/database');
 const tokenService = require('../services/tokenService');
