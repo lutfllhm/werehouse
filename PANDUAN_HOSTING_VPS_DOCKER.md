@@ -333,8 +333,7 @@ certbot renew --dry-run
    https://account.accurate.id/oauth/authorize?client_id=CLIENT_ID&response_type=code&redirect_uri=https://werehouse.iwareid.com/api/accurate/callback&scope=item_view sales_order_view sales_order_save
    ```
 
-4. **Authorize Aplikasi**
-   - Login ke Accurate
+4. **Authorize Aplikasi**  
    - Pilih database yang akan digunakan
    - Klik "Authorize"
    - Anda akan di-redirect ke callback URL dengan code
@@ -377,22 +376,22 @@ certbot renew --dry-run
 ### 7.2 Test Koneksi Accurate
 
 ```bash
-# Masuk ke container backend
-docker compose exec backend sh
-
-# Jalankan test script
-node scripts/testAccurateConnection.js
-
-# Keluar dari container
-exit
+# Test dari dalam container
+docker compose exec backend node scripts/testAccurateConnection.js
 ```
 
 Output yang benar:
 ```
+⚠ .env file not found at: /app/.env
+  Using environment variables from Docker/system
+✓ Database connected
+✓ Table accurate_tokens exists
 ✓ Koneksi ke Accurate Online berhasil!
 ✓ Database ID: 123456
 ✓ Database Name: Your Company Name
 ```
+
+**Catatan:** Script akan menggunakan environment variables dari `docker-compose.yml`, jadi tidak perlu file `.env` di dalam container.
 
 ---
 
@@ -571,6 +570,19 @@ curl http://localhost:5001/api/health
 systemctl restart nginx
 ```
 
+### Problem: Script mencari .env file di container
+
+```bash
+# Error: .env file not found at: /app/.env
+# Solusi: Script sudah diperbaiki untuk menggunakan env vars dari Docker
+
+# Jika masih error, pastikan environment variables sudah di-set di docker-compose.yml
+docker compose config | grep ACCURATE
+
+# Atau restart container
+docker compose restart backend
+```
+
 ### Problem: SSL certificate error
 
 ```bash
@@ -665,6 +677,111 @@ Jika ada masalah:
 - [ ] Login ke aplikasi berhasil
 - [ ] Sync data dari Accurate berhasil
 - [ ] Password default sudah diganti
+
+---
+
+## 📝 Checklist Deployment
+
+- [ ] VPS sudah siap dan bisa diakses via SSH
+- [ ] Docker & Docker Compose terinstall
+- [ ] Repository sudah di-clone
+- [ ] File .env sudah dikonfigurasi dengan benar
+- [ ] Containers berhasil running (mysql, backend, frontend)
+- [ ] Nginx sudah dikonfigurasi dan running
+- [ ] SSL certificate sudah terinstall
+- [ ] DNS A Record sudah pointing ke IP VPS
+- [ ] Accurate credentials sudah didapatkan
+- [ ] Access token Accurate sudah di-generate
+- [ ] Test koneksi Accurate berhasil
+- [ ] Login ke aplikasi berhasil
+- [ ] Sync data dari Accurate berhasil
+- [ ] Password default sudah diganti
+
+---
+
+## 🚀 Quick Reference Commands
+
+### Docker Commands
+```bash
+# Start semua containers
+docker compose up -d
+
+# Stop semua containers
+docker compose down
+
+# Restart container tertentu
+docker compose restart backend
+
+# Lihat logs
+docker compose logs -f backend
+
+# Lihat status
+docker compose ps
+
+# Rebuild dan restart
+docker compose up -d --build
+
+# Masuk ke container
+docker compose exec backend sh
+docker compose exec mysql mysql -u iware_user -p
+```
+
+### Maintenance Commands
+```bash
+# Update aplikasi
+cd /var/www/iware
+git pull origin main
+docker compose down
+docker compose up -d --build
+
+# Backup database
+docker compose exec mysql mysqldump -u iware_user -p iware_warehouse > backup_$(date +%Y%m%d).sql
+
+# Restore database
+docker compose exec -T mysql mysql -u iware_user -p iware_warehouse < backup.sql
+
+# Cek disk space
+df -h
+
+# Cek memory usage
+free -h
+
+# Cek Docker disk usage
+docker system df
+```
+
+### Nginx Commands
+```bash
+# Test config
+nginx -t
+
+# Reload config
+systemctl reload nginx
+
+# Restart Nginx
+systemctl restart nginx
+
+# Cek status
+systemctl status nginx
+
+# Lihat logs
+tail -f /var/log/nginx/werehouse-error.log
+```
+
+### SSL Commands
+```bash
+# Renew certificate
+certbot renew
+
+# Force renew
+certbot renew --force-renewal
+
+# List certificates
+certbot certificates
+
+# Test auto-renewal
+certbot renew --dry-run
+```
 
 ---
 
