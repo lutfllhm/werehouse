@@ -7,7 +7,7 @@ services:
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: Jasadenam66/
-      MYSQL_DATABASE: iware_werehouse
+      MYSQL_DATABASE: iware_warehouse
       MYSQL_USER: iware_user
       MYSQL_PASSWORD: Jasadenam66/
     volumes:
