@@ -98,7 +98,7 @@ async function checkAccurateIntegration() {
     console.log('5. SUPERADMIN USERS');
     console.log('-'.repeat(70));
     const [users] = await pool.query(`
-      SELECT id, username, nama_lengkap, role 
+      SELECT id, email, nama, role 
       FROM users 
       WHERE role = 'superadmin'
     `);
@@ -110,7 +110,7 @@ async function checkAccurateIntegration() {
     } else {
       console.log(`   ✓ Found ${users.length} superadmin(s):`);
       users.forEach((user, idx) => {
-        console.log(`   ${idx + 1}. ${user.username} (${user.nama_lengkap}) - ID: ${user.id}`);
+        console.log(`   ${idx + 1}. ${user.email} (${user.nama}) - ID: ${user.id}`);
       });
       console.log('');
     }
