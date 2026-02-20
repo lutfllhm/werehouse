@@ -6,6 +6,10 @@ node_modules/
 .env
 .env.local
 .env.production
+.env.docker
+backend/.env
+backend/.env.local
+backend/.env.production
 
 # Build output
 dist/
