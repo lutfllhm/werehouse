@@ -1,10 +1,72 @@
 const axios = require('axios');
+const crypto = require('crypto');
 const tokenService = require('./tokenService');
 
 class AccurateService {
   constructor() {
-    this.baseURL = process.env.ACCURATE_API_URL;
-    this.databaseId = process.env.ACCURATE_DATABASE_ID;
+    this.accountURL = 'https://account.accurate.id';
+    this.signatureSecret = process.env.ACCURATE_SIGNATURE_SECRET;
+    this.hostCache = null;
+    this.hostCacheTime = null;
+  }
+
+  // Generate timestamp untuk API
+  generateTimestamp() {
+    const now = new Date();
+    const day = String(now.getDate()).padStart(2, '0');
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const year = now.getFullYear();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+  }
+
+  // Generate signature HMAC SHA-256
+  generateSignature(timestamp) {
+    const hmac = crypto.createHmac('sha256', this.signatureSecret);
+    hmac.update(timestamp);
+    return hmac.digest('base64');
+  }
+
+  // Get host dinamis dari API Token
+  async getHost(accessToken) {
+    // Cache host selama 30 hari
+    if (this.hostCache && this.hostCacheTime) {
+      const daysSinceCache = (Date.now() - this.hostCacheTime) / (1000 * 60 * 60 * 24);
+      if (daysSinceCache < 30) {
+        return this.hostCache;
+      }
+    }
+
+    try {
+      const timestamp = this.generateTimestamp();
+      const signature = this.generateSignature(timestamp);
+
+      const response = await axios.post(
+        `${this.accountURL}/api/api-token.do`,
+        {},
+        {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'X-Api-Timestamp': timestamp,
+            'X-Api-Signature': signature,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (response.data.s && response.data.d['data usaha']) {
+        this.hostCache = response.data.d['data usaha'].host;
+        this.hostCacheTime = Date.now();
+        return this.hostCache;
+      }
+
+      throw new Error('Failed to get host from API token');
+    } catch (error) {
+      console.error('Error getting host:', error.message);
+      throw error;
+    }
   }
 
   // Konfigurasi header untuk API Accurate (dengan userId dari database)
@@ -16,29 +78,49 @@ class AccurateService {
       throw new Error('Token tidak valid atau sudah expired');
     }
 
+    const timestamp = this.generateTimestamp();
+    const signature = this.generateSignature(timestamp);
+
     return {
       'Authorization': `Bearer ${tokenResult.token.accessToken}`,
-      'X-Api-Key': this.databaseId,
+      'X-Api-Timestamp': timestamp,
+      'X-Api-Signature': signature,
       'Content-Type': 'application/json'
     };
   }
 
   // Konfigurasi header untuk API Accurate (fallback ke .env jika tidak ada userId)
   getHeadersFromEnv() {
+    const timestamp = this.generateTimestamp();
+    const signature = this.generateSignature(timestamp);
+
     return {
       'Authorization': `Bearer ${process.env.ACCURATE_ACCESS_TOKEN}`,
-      'X-Api-Key': this.databaseId,
+      'X-Api-Timestamp': timestamp,
+      'X-Api-Signature': signature,
       'Content-Type': 'application/json'
     };
+  }
+
+  // Get base URL untuk API calls
+  async getBaseURL(accessToken) {
+    const host = await this.getHost(accessToken);
+    return `${host}/accurate/api`;
   }
 
   // Ambil data items dari Accurate Online
   async getItems(userId, params = {}) {
     try {
+      const tokenResult = await tokenService.getActiveToken(userId);
+      if (!tokenResult.success) {
+        throw new Error('Token tidak valid');
+      }
+
+      const baseURL = await this.getBaseURL(tokenResult.token.accessToken);
       const headers = await this.getHeaders(userId);
       
       // Menggunakan endpoint /list.do sesuai API Accurate
-      const response = await axios.get(`${this.baseURL}/item/list.do`, {
+      const response = await axios.get(`${baseURL}/item/list.do`, {
         headers,
         params: {
           sp: params.page || 1,
@@ -351,10 +433,16 @@ class AccurateService {
     try {
       console.log('Getting sales orders for userId:', userId);
       
+      const tokenResult = await tokenService.getActiveToken(userId);
+      if (!tokenResult.success) {
+        throw new Error('Token tidak valid');
+      }
+
+      const baseURL = await this.getBaseURL(tokenResult.token.accessToken);
       const headers = await this.getHeaders(userId);
       
       console.log('Request to Accurate API:', {
-        url: `${this.baseURL}/sales-order/list.do`,
+        url: `${baseURL}/sales-order/list.do`,
         params: {
           sp: params.page || 1,
           pageSize: params.pageSize || 100,
@@ -363,7 +451,7 @@ class AccurateService {
       });
       
       // Menggunakan endpoint /list.do sesuai API Accurate
-      const response = await axios.get(`${this.baseURL}/sales-order/list.do`, {
+      const response = await axios.get(`${baseURL}/sales-order/list.do`, {
         headers,
         params: {
           sp: params.page || 1,
