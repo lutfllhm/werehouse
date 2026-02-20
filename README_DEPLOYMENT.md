@@ -30,6 +30,15 @@ Panduan lengkap dari VPS kosong sampai aplikasi live dengan integrasi Accurate O
 ```
 ✅ PANDUAN_FINAL_LENGKAP.md    - PANDUAN UTAMA (BACA INI!)
 ✅ README_DEPLOYMENT.md         - File ini
+✅ SSL-SETUP-QUICKSTART.md      - Quick start SSL setup
+✅ setup-ssl-manual.md          - Panduan SSL lengkap
+```
+
+### 🔧 SSL Setup Scripts
+```
+✅ setup-ssl.sh                 - Script otomatis setup SSL
+✅ check-ssl.sh                 - Script cek status SSL
+✅ renew-ssl.sh                 - Script manual renewal SSL
 ```
 
 ---
@@ -54,14 +63,13 @@ docker compose build
 docker compose up -d
 ```
 
-### 4. Setup SSL
+### 4. Setup SSL (Otomatis)
 ```bash
-apt install -y certbot
-docker compose stop nginx
-certbot certonly --standalone -d werehouse.iwareid.com
-mkdir -p ssl && cp -r /etc/letsencrypt/* ssl/
-docker compose start nginx
+chmod +x setup-ssl.sh
+./setup-ssl.sh
 ```
+
+Atau lihat: `SSL-SETUP-QUICKSTART.md` untuk panduan lengkap
 
 ### 5. Done!
 ```
