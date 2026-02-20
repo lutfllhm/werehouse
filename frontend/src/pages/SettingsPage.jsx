@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FiUser, FiLock, FiSave } from 'react-icons/fi';
+import { FiUser, FiLock, FiSave, FiLink, FiCheckCircle, FiXCircle } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
+import { getAccurateAuthUrl, checkAccurateStatus, disconnectAccurate } from '../utils/accurate';
 
 const SettingsPage = () => {
   const { user, updateProfile } = useAuth();
@@ -14,6 +15,75 @@ const SettingsPage = () => {
     password_konfirmasi: ''
   });
   const [loading, setLoading] = useState(false);
+  const [accurateStatus, setAccurateStatus] = useState({
+    connected: false,
+    loading: true
+  });
+
+  // Check Accurate connection status on mount
+  useEffect(() => {
+    checkStatus();
+    
+    // Check for OAuth callback success
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('accurate') === 'connected') {
+      toast.success('Berhasil terhubung dengan Accurate Online!');
+      // Remove query param
+      window.history.replaceState({}, '', '/settings');
+      checkStatus();
+    }
+  }, []);
+
+  const checkStatus = async () => {
+    try {
+      const result = await checkAccurateStatus();
+      setAccurateStatus({
+        connected: result.connected,
+        loading: false,
+        data: result.data,
+        tokenInfo: result.tokenInfo
+      });
+    } catch (error) {
+      setAccurateStatus({
+        connected: false,
+        loading: false
+      });
+    }
+  };
+
+  const handleConnectAccurate = async () => {
+    try {
+      const result = await getAccurateAuthUrl();
+      if (result.success && result.authUrl) {
+        // Redirect to Accurate OAuth page
+        window.location.href = result.authUrl;
+      } else {
+        toast.error('Gagal mendapatkan authorization URL');
+      }
+    } catch (error) {
+      toast.error('Gagal menghubungkan ke Accurate');
+      console.error(error);
+    }
+  };
+
+  const handleDisconnectAccurate = async () => {
+    if (!window.confirm('Apakah Anda yakin ingin memutuskan koneksi dengan Accurate Online?')) {
+      return;
+    }
+
+    try {
+      const result = await disconnectAccurate();
+      if (result.success) {
+        toast.success('Berhasil memutuskan koneksi dengan Accurate');
+        checkStatus();
+      } else {
+        toast.error(result.message || 'Gagal memutuskan koneksi');
+      }
+    } catch (error) {
+      toast.error('Gagal memutuskan koneksi');
+      console.error(error);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -68,8 +138,75 @@ const SettingsPage = () => {
         </motion.div>
 
         {/* Settings Form */}
-        <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="lg:col-span-2 card">
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="lg:col-span-2 space-y-6">
+          {/* Accurate Integration Section */}
+          {user?.role === 'superadmin' && (
+            <div className="card">
+              <div className="flex items-center gap-2 mb-4">
+                <FiLink className="text-primary-600" />
+                <h3 className="text-lg font-bold text-gray-900">Integrasi Accurate Online</h3>
+              </div>
+              
+              {accurateStatus.loading ? (
+                <div className="text-center py-4">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
+                  <p className="text-gray-600 mt-2">Mengecek status koneksi...</p>
+                </div>
+              ) : accurateStatus.connected ? (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-green-600">
+                    <FiCheckCircle className="text-xl" />
+                    <span className="font-medium">Terhubung dengan Accurate Online</span>
+                  </div>
+                  
+                  {accurateStatus.tokenInfo && (
+                    <div className="bg-gray-50 rounded-lg p-4 space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Scope:</span>
+                        <span className="text-gray-900 font-medium">{accurateStatus.tokenInfo.scope || 'N/A'}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Expires:</span>
+                        <span className="text-gray-900 font-medium">
+                          {accurateStatus.tokenInfo.expiresAt 
+                            ? new Date(accurateStatus.tokenInfo.expiresAt).toLocaleString('id-ID')
+                            : 'N/A'}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <button
+                    onClick={handleDisconnectAccurate}
+                    className="btn-secondary w-full"
+                  >
+                    Putuskan Koneksi
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <FiXCircle className="text-xl" />
+                    <span>Belum terhubung dengan Accurate Online</span>
+                  </div>
+                  <p className="text-sm text-gray-600">
+                    Hubungkan aplikasi dengan Accurate Online untuk sinkronisasi data items dan sales orders.
+                  </p>
+                  <button
+                    onClick={handleConnectAccurate}
+                    className="btn-primary w-full flex items-center justify-center gap-2"
+                  >
+                    <FiLink />
+                    Hubungkan Accurate
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Profile & Password Form */}
+          <div className="card">
+            <form onSubmit={handleSubmit} className="space-y-6">
             {/* Profile Section */}
             <div>
               <div className="flex items-center gap-2 mb-4">
@@ -146,6 +283,7 @@ const SettingsPage = () => {
               </button>
             </div>
           </form>
+          </div>
         </motion.div>
       </div>
     </div>

@@ -5,11 +5,25 @@ const tokenService = require('../services/tokenService');
 // Generate OAuth Authorization URL
 exports.getAuthUrl = (req, res) => {
   try {
+    // Scope yang valid untuk Accurate Online OAuth
+    // Referensi: https://accurate.id/api-myob/
+    const scopes = [
+      'item_view',
+      'item_save',
+      'sales_order_view',
+      'sales_order_save',
+      'customer_view'
+    ];
+
     const authUrl = `https://account.accurate.id/oauth/authorize?` +
       `client_id=${process.env.ACCURATE_CLIENT_ID}` +
       `&redirect_uri=${encodeURIComponent(process.env.ACCURATE_REDIRECT_URI)}` +
       `&response_type=code` +
-      `&scope=item_view sales_order_view sales_order_save customer_view`;
+      `&scope=${scopes.join(' ')}`;
+
+    console.log('Generated Auth URL:', authUrl);
+    console.log('Client ID:', process.env.ACCURATE_CLIENT_ID);
+    console.log('Redirect URI:', process.env.ACCURATE_REDIRECT_URI);
 
     res.json({
       success: true,
