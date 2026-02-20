@@ -6,10 +6,10 @@ services:
     container_name: iware-mysql
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: RootSecure2024!
-      MYSQL_DATABASE: iware_db
+      MYSQL_ROOT_PASSWORD: Jasadenam66/
+      MYSQL_DATABASE: iware_werehouse
       MYSQL_USER: iware_user
-      MYSQL_PASSWORD: IwareSecure2024!
+      MYSQL_PASSWORD: Jasadenam66/
     volumes:
       - mysql_data:/var/lib/mysql
       - ./backend/SETUP_LENGKAP.sql:/docker-entrypoint-initdb.d/init.sql
