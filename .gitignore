@@ -44,3 +44,17 @@ temp/
 KREDENSIAL.md
 PASSWORD_INFO.md
 *_CREDENTIALS.md
+
+# SSL Certificates
+ssl/
+*.pem
+*.crt
+*.key
+
+# Backups
+backups/
+*.sql
+*.tar.gz
+
+# Docker volumes
+mysql_data/
