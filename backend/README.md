@@ -1,40 +1,65 @@
 # iWare Backend API
 
-Backend API untuk sistem Warehouse Monitoring & Schedule iWare.
+Backend API untuk sistem Warehouse Monitoring & Schedule iWare dengan integrasi Accurate Online.
 
 ## Teknologi
 
-- Node.js
-- Express.js
-- MySQL
+- Node.js + Express.js
+- MySQL Database
 - JWT Authentication
-- Accurate Online API Integration
+- Accurate Online API Token Integration
 
 ## Instalasi
 
-1. Install dependencies:
+### 1. Install Dependencies
 ```bash
 npm install
 ```
 
-2. Setup database:
-- Buat database MySQL
-- Import file `config/database.sql`
-- Atau jalankan query SQL di phpMyAdmin
+### 2. Setup Database
+```bash
+# Setup database otomatis
+npm run setup
 
-3. Konfigurasi environment:
+# Atau setup interaktif
+npm run setup-interactive
+
+# Atau import manual
+npm run import-db
+```
+
+### 3. Konfigurasi Environment
 ```bash
 cp .env.example .env
 ```
 
-Edit file `.env` dan sesuaikan dengan konfigurasi Anda.
+Edit file `.env`:
+```env
+# Database
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=your_password
+DB_NAME=iware_db
 
-4. Generate password untuk superadmin:
-```bash
-node -e "console.log(require('bcryptjs').hashSync('jasad666', 10))"
+# JWT
+JWT_SECRET=your_jwt_secret
+
+# Accurate Online API Token
+ACCURATE_ACCESS_TOKEN=aat.xxx.yyy.zzz
+ACCURATE_SIGNATURE_SECRET=your_signature_secret
 ```
 
-Copy hasil hash dan update di file `config/database.sql` pada bagian INSERT superadmin.
+### 4. Setup Accurate Integration
+```bash
+# Tambah tabel accurate_tokens
+npm run add-accurate-table
+
+# Tambah token dari .env ke database
+npm run add-token
+
+# Test koneksi API Token
+npm run test-api-token
+```
 
 ## Menjalankan Server
 
@@ -46,6 +71,61 @@ npm run dev
 Production mode:
 ```bash
 npm start
+```
+
+## NPM Scripts
+
+### Development
+- `npm run dev` - Jalankan server dengan nodemon
+- `npm start` - Jalankan server production
+
+### Database
+- `npm run setup` - Setup database otomatis
+- `npm run setup-interactive` - Setup database interaktif
+- `npm run import-db` - Import SQL file
+- `npm run check-db` - Cek koneksi database
+
+### Accurate Integration
+- `npm run add-accurate-table` - Tambah tabel accurate_tokens
+- `npm run add-token` - Tambah token dari .env ke database
+- `npm run test-api-token` - Test API Token Accurate
+
+### Utilities
+- `npm run generate-password` - Generate bcrypt password
+
+## Accurate Online Integration
+
+Aplikasi ini menggunakan **API Token** untuk integrasi dengan Accurate Online.
+
+### Setup API Token
+
+1. Login ke https://account.accurate.id
+2. Buka menu **Developer** → **API Token**
+3. Klik **Create New Token**
+4. Copy **API Token** dan **Signature Secret**
+5. Tambahkan ke file `.env`
+
+### Dokumentasi
+
+- **Lengkap**: `docs/ACCURATE_API_TOKEN.md`
+- **Quick Start**: `docs/ACCURATE_QUICK_START.md`
+- **Implementasi**: `../ACCURATE_API_IMPLEMENTATION.md`
+
+### Test Koneksi
+
+```bash
+npm run test-api-token
+```
+
+Output yang diharapkan:
+```
+✓ Timestamp generation: OK
+✓ HMAC SHA-256 signature: OK
+✓ API Token authentication: OK
+✓ Dynamic host retrieval: OK
+✓ Host caching (30 days): OK
+✓ Request headers: OK
+✓ API calls with redirect support: OK
 ```
 
 ## API Endpoints

@@ -11,13 +11,9 @@
     "import-db": "node scripts/importDatabase.js",
     "check-db": "node scripts/checkDatabase.js",
     "add-accurate-table": "node scripts/addAccurateTokensTable.js",
-    "diagnose": "node scripts/diagnoseDeployment.js",
-    "verify": "node scripts/verifySetup.js",
-    "test-login": "node scripts/testLogin.js",
-    "test-accurate": "node scripts/testAccurateConnection.js",
-    "generate-password": "node scripts/generatePassword.js",
-    "fix-login": "node scripts/fixLogin.js",
-    "check": "node scripts/checkAndFix.js"
+    "add-token": "node scripts/addTokenFromEnv.js",
+    "test-api-token": "node scripts/testApiToken.js",
+    "generate-password": "node scripts/generatePassword.js"
   },
   "keywords": ["warehouse", "monitoring", "accurate"],
   "author": "iWare",

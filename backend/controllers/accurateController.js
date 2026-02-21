@@ -269,6 +269,34 @@ exports.getDatabases = async (req, res) => {
   }
 };
 
+// Get API Token Info
+exports.getApiTokenInfo = async (req, res) => {
+  try {
+    const userId = req.userData.userId;
+
+    const result = await accurateService.getApiTokenInfo(userId);
+
+    if (result.sukses) {
+      res.json({
+        success: true,
+        data: result.data
+      });
+    } else {
+      res.status(500).json({
+        success: false,
+        message: result.pesan,
+        error: result.error
+      });
+    }
+  } catch (error) {
+    console.error('Error getting API token info:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Gagal mengambil informasi API token'
+    });
+  }
+};
+
 // Get Items from Accurate
 exports.getItems = async (req, res) => {
   try {

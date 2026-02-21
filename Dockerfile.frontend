@@ -6,11 +6,14 @@ WORKDIR /app
 # Copy package files
 COPY frontend/package*.json ./
 
-# Install dependencies
-RUN npm ci
+# Install dependencies with clean cache
+RUN npm cache clean --force && npm install
 
 # Copy source files
 COPY frontend/ ./
+
+# Fix permissions for node_modules binaries
+RUN chmod -R +x node_modules/.bin
 
 # Build application
 RUN npm run build

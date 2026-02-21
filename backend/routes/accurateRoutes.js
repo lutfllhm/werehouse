@@ -12,6 +12,7 @@ router.post('/disconnect', verifikasiToken, accurateController.disconnect);
 // API Status & Info
 router.get('/status', verifikasiToken, accurateController.checkStatus);
 router.get('/databases', verifikasiToken, accurateController.getDatabases);
+router.get('/token-info', verifikasiToken, accurateController.getApiTokenInfo);
 
 // Item Routes
 router.get('/items', verifikasiToken, accurateController.getItems);

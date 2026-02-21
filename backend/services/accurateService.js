@@ -6,8 +6,8 @@ class AccurateService {
   constructor() {
     this.accountURL = 'https://account.accurate.id';
     this.signatureSecret = process.env.ACCURATE_SIGNATURE_SECRET;
-    this.hostCache = null;
-    this.hostCacheTime = null;
+    this.hostCache = new Map(); // Cache per token
+    this.hostCacheTime = new Map();
   }
 
   // Generate timestamp untuk API
@@ -31,11 +31,14 @@ class AccurateService {
 
   // Get host dinamis dari API Token
   async getHost(accessToken) {
-    // Cache host selama 30 hari
-    if (this.hostCache && this.hostCacheTime) {
-      const daysSinceCache = (Date.now() - this.hostCacheTime) / (1000 * 60 * 60 * 24);
+    // Cache host selama 30 hari per token
+    const cachedHost = this.hostCache.get(accessToken);
+    const cachedTime = this.hostCacheTime.get(accessToken);
+    
+    if (cachedHost && cachedTime) {
+      const daysSinceCache = (Date.now() - cachedTime) / (1000 * 60 * 60 * 24);
       if (daysSinceCache < 30) {
-        return this.hostCache;
+        return cachedHost;
       }
     }
 
@@ -52,14 +55,17 @@ class AccurateService {
             'X-Api-Timestamp': timestamp,
             'X-Api-Signature': signature,
             'Content-Type': 'application/json'
-          }
+          },
+          maxRedirects: 5,
+          validateStatus: (status) => status < 400
         }
       );
 
       if (response.data.s && response.data.d['data usaha']) {
-        this.hostCache = response.data.d['data usaha'].host;
-        this.hostCacheTime = Date.now();
-        return this.hostCache;
+        const host = response.data.d['data usaha'].host;
+        this.hostCache.set(accessToken, host);
+        this.hostCacheTime.set(accessToken, Date.now());
+        return host;
       }
 
       throw new Error('Failed to get host from API token');
@@ -70,7 +76,7 @@ class AccurateService {
   }
 
   // Konfigurasi header untuk API Accurate (dengan userId dari database)
-  async getHeaders(userId) {
+  async getHeaders(userId, languageProfile = 'ID') {
     // Ambil token dari database
     const tokenResult = await tokenService.getActiveToken(userId);
     
@@ -81,12 +87,19 @@ class AccurateService {
     const timestamp = this.generateTimestamp();
     const signature = this.generateSignature(timestamp);
 
-    return {
+    const headers = {
       'Authorization': `Bearer ${tokenResult.token.accessToken}`,
       'X-Api-Timestamp': timestamp,
       'X-Api-Signature': signature,
       'Content-Type': 'application/json'
     };
+
+    // Tambahkan X-Language-Profile jika bukan default (ID)
+    if (languageProfile && languageProfile !== 'ID') {
+      headers['X-Language-Profile'] = languageProfile;
+    }
+
+    return headers;
   }
 
   // Konfigurasi header untuk API Accurate (fallback ke .env jika tidak ada userId)
@@ -108,6 +121,46 @@ class AccurateService {
     return `${host}/accurate/api`;
   }
 
+  // Get API Token Info (untuk validasi dan mendapatkan informasi database)
+  async getApiTokenInfo(userId) {
+    try {
+      const tokenResult = await tokenService.getActiveToken(userId);
+      if (!tokenResult.success) {
+        throw new Error('Token tidak valid');
+      }
+
+      const timestamp = this.generateTimestamp();
+      const signature = this.generateSignature(timestamp);
+
+      const response = await axios.post(
+        `${this.accountURL}/api/api-token.do`,
+        {},
+        {
+          headers: {
+            'Authorization': `Bearer ${tokenResult.token.accessToken}`,
+            'X-Api-Timestamp': timestamp,
+            'X-Api-Signature': signature,
+            'Content-Type': 'application/json'
+          },
+          maxRedirects: 5,
+          validateStatus: (status) => status < 400
+        }
+      );
+
+      return {
+        sukses: true,
+        data: response.data
+      };
+    } catch (error) {
+      console.error('Error getting API token info:', error.message);
+      return {
+        sukses: false,
+        pesan: 'Gagal mengambil informasi API token',
+        error: error.message
+      };
+    }
+  }
+
   // Ambil data items dari Accurate Online
   async getItems(userId, params = {}) {
     try {
@@ -126,7 +179,9 @@ class AccurateService {
           sp: params.page || 1,
           pageSize: params.pageSize || 100,
           ...params
-        }
+        },
+        maxRedirects: 5,
+        validateStatus: (status) => status < 400
       });
 
       return {
@@ -146,12 +201,20 @@ class AccurateService {
   // Ambil detail item berdasarkan ID
   async getItemDetail(userId, itemId) {
     try {
+      const tokenResult = await tokenService.getActiveToken(userId);
+      if (!tokenResult.success) {
+        throw new Error('Token tidak valid');
+      }
+
+      const baseURL = await this.getBaseURL(tokenResult.token.accessToken);
       const headers = await this.getHeaders(userId);
       
       // Menggunakan endpoint /detail.do sesuai API Accurate
-      const response = await axios.get(`${this.baseURL}/item/detail.do`, {
+      const response = await axios.get(`${baseURL}/item/detail.do`, {
         headers,
-        params: { id: itemId }
+        params: { id: itemId },
+        maxRedirects: 5,
+        validateStatus: (status) => status < 400
       });
 
       return {
@@ -171,10 +234,19 @@ class AccurateService {
   // Ambil stock item
   async getItemStock(userId, itemId) {
     try {
+      const tokenResult = await tokenService.getActiveToken(userId);
+      if (!tokenResult.success) {
+        throw new Error('Token tidak valid');
+      }
+
+      const baseURL = await this.getBaseURL(tokenResult.token.accessToken);
       const headers = await this.getHeaders(userId);
-      const response = await axios.get(`${this.baseURL}/item/get-stock.do`, {
+      
+      const response = await axios.get(`${baseURL}/item/get-stock.do`, {
         headers,
-        params: { id: itemId }
+        params: { id: itemId },
+        maxRedirects: 5,
+        validateStatus: (status) => status < 400
       });
 
       return {
@@ -194,14 +266,23 @@ class AccurateService {
   // List stock items (all items with stock info)
   async listItemStock(userId, params = {}) {
     try {
+      const tokenResult = await tokenService.getActiveToken(userId);
+      if (!tokenResult.success) {
+        throw new Error('Token tidak valid');
+      }
+
+      const baseURL = await this.getBaseURL(tokenResult.token.accessToken);
       const headers = await this.getHeaders(userId);
-      const response = await axios.get(`${this.baseURL}/item/list-stock.do`, {
+      
+      const response = await axios.get(`${baseURL}/item/list-stock.do`, {
         headers,
         params: {
           sp: params.page || 1,
           pageSize: params.pageSize || 100,
           ...params
-        }
+        },
+        maxRedirects: 5,
+        validateStatus: (status) => status < 400
       });
 
       return {
@@ -221,9 +302,18 @@ class AccurateService {
   // Save item
   async saveItem(userId, data) {
     try {
+      const tokenResult = await tokenService.getActiveToken(userId);
+      if (!tokenResult.success) {
+        throw new Error('Token tidak valid');
+      }
+
+      const baseURL = await this.getBaseURL(tokenResult.token.accessToken);
       const headers = await this.getHeaders(userId);
-      const response = await axios.post(`${this.baseURL}/item/save.do`, data, {
-        headers
+      
+      const response = await axios.post(`${baseURL}/item/save.do`, data, {
+        headers,
+        maxRedirects: 5,
+        validateStatus: (status) => status < 400
       });
 
       return {
@@ -243,9 +333,18 @@ class AccurateService {
   // Bulk save items
   async bulkSaveItems(userId, dataArray) {
     try {
+      const tokenResult = await tokenService.getActiveToken(userId);
+      if (!tokenResult.success) {
+        throw new Error('Token tidak valid');
+      }
+
+      const baseURL = await this.getBaseURL(tokenResult.token.accessToken);
       const headers = await this.getHeaders(userId);
-      const response = await axios.post(`${this.baseURL}/item/bulk-save.do`, dataArray, {
-        headers
+      
+      const response = await axios.post(`${baseURL}/item/bulk-save.do`, dataArray, {
+        headers,
+        maxRedirects: 5,
+        validateStatus: (status) => status < 400
       });
 
       return {
@@ -265,10 +364,19 @@ class AccurateService {
   // Delete item
   async deleteItem(userId, itemId) {
     try {
+      const tokenResult = await tokenService.getActiveToken(userId);
+      if (!tokenResult.success) {
+        throw new Error('Token tidak valid');
+      }
+
+      const baseURL = await this.getBaseURL(tokenResult.token.accessToken);
       const headers = await this.getHeaders(userId);
-      const response = await axios.delete(`${this.baseURL}/item/delete.do`, {
+      
+      const response = await axios.delete(`${baseURL}/item/delete.do`, {
         headers,
-        params: { id: itemId }
+        params: { id: itemId },
+        maxRedirects: 5,
+        validateStatus: (status) => status < 400
       });
 
       return {
@@ -288,10 +396,19 @@ class AccurateService {
   // Get selling price
   async getSellingPrice(userId, itemId, params = {}) {
     try {
+      const tokenResult = await tokenService.getActiveToken(userId);
+      if (!tokenResult.success) {
+        throw new Error('Token tidak valid');
+      }
+
+      const baseURL = await this.getBaseURL(tokenResult.token.accessToken);
       const headers = await this.getHeaders(userId);
-      const response = await axios.get(`${this.baseURL}/item/get-selling-price.do`, {
+      
+      const response = await axios.get(`${baseURL}/item/get-selling-price.do`, {
         headers,
-        params: { id: itemId, ...params }
+        params: { id: itemId, ...params },
+        maxRedirects: 5,
+        validateStatus: (status) => status < 400
       });
 
       return {
@@ -311,10 +428,19 @@ class AccurateService {
   // Get nearest cost
   async getNearestCost(userId, itemId, params = {}) {
     try {
+      const tokenResult = await tokenService.getActiveToken(userId);
+      if (!tokenResult.success) {
+        throw new Error('Token tidak valid');
+      }
+
+      const baseURL = await this.getBaseURL(tokenResult.token.accessToken);
       const headers = await this.getHeaders(userId);
-      const response = await axios.get(`${this.baseURL}/item/get-nearest-cost.do`, {
+      
+      const response = await axios.get(`${baseURL}/item/get-nearest-cost.do`, {
         headers,
-        params: { id: itemId, ...params }
+        params: { id: itemId, ...params },
+        maxRedirects: 5,
+        validateStatus: (status) => status < 400
       });
 
       return {
@@ -334,10 +460,19 @@ class AccurateService {
   // Get vendor price
   async getVendorPrice(userId, itemId, params = {}) {
     try {
+      const tokenResult = await tokenService.getActiveToken(userId);
+      if (!tokenResult.success) {
+        throw new Error('Token tidak valid');
+      }
+
+      const baseURL = await this.getBaseURL(tokenResult.token.accessToken);
       const headers = await this.getHeaders(userId);
-      const response = await axios.get(`${this.baseURL}/item/vendor-price.do`, {
+      
+      const response = await axios.get(`${baseURL}/item/vendor-price.do`, {
         headers,
-        params: { id: itemId, ...params }
+        params: { id: itemId, ...params },
+        maxRedirects: 5,
+        validateStatus: (status) => status < 400
       });
 
       return {
@@ -357,10 +492,19 @@ class AccurateService {
   // Search by item or serial number
   async searchByItemOrSN(userId, searchTerm) {
     try {
+      const tokenResult = await tokenService.getActiveToken(userId);
+      if (!tokenResult.success) {
+        throw new Error('Token tidak valid');
+      }
+
+      const baseURL = await this.getBaseURL(tokenResult.token.accessToken);
       const headers = await this.getHeaders(userId);
-      const response = await axios.get(`${this.baseURL}/item/search-by-item-or-sn.do`, {
+      
+      const response = await axios.get(`${baseURL}/item/search-by-item-or-sn.do`, {
         headers,
-        params: { q: searchTerm }
+        params: { q: searchTerm },
+        maxRedirects: 5,
+        validateStatus: (status) => status < 400
       });
 
       return {
@@ -380,10 +524,19 @@ class AccurateService {
   // Search by no UPC
   async searchByNoUPC(userId, upc) {
     try {
+      const tokenResult = await tokenService.getActiveToken(userId);
+      if (!tokenResult.success) {
+        throw new Error('Token tidak valid');
+      }
+
+      const baseURL = await this.getBaseURL(tokenResult.token.accessToken);
       const headers = await this.getHeaders(userId);
-      const response = await axios.get(`${this.baseURL}/item/search-by-no-upc.do`, {
+      
+      const response = await axios.get(`${baseURL}/item/search-by-no-upc.do`, {
         headers,
-        params: { upc: upc }
+        params: { upc: upc },
+        maxRedirects: 5,
+        validateStatus: (status) => status < 400
       });
 
       return {
@@ -403,15 +556,24 @@ class AccurateService {
   // Get stock mutation history
   async getStockMutationHistory(userId, itemId, params = {}) {
     try {
+      const tokenResult = await tokenService.getActiveToken(userId);
+      if (!tokenResult.success) {
+        throw new Error('Token tidak valid');
+      }
+
+      const baseURL = await this.getBaseURL(tokenResult.token.accessToken);
       const headers = await this.getHeaders(userId);
-      const response = await axios.get(`${this.baseURL}/item/stock-mutation-history.do`, {
+      
+      const response = await axios.get(`${baseURL}/item/stock-mutation-history.do`, {
         headers,
         params: { 
           id: itemId,
           sp: params.page || 1,
           pageSize: params.pageSize || 100,
           ...params
-        }
+        },
+        maxRedirects: 5,
+        validateStatus: (status) => status < 400
       });
 
       return {
@@ -457,7 +619,9 @@ class AccurateService {
           sp: params.page || 1,
           pageSize: params.pageSize || 100,
           ...params
-        }
+        },
+        maxRedirects: 5,
+        validateStatus: (status) => status < 400
       });
 
       console.log('Accurate API response status:', response.status);
@@ -487,12 +651,20 @@ class AccurateService {
   // Ambil detail sales order berdasarkan ID
   async getSalesOrderDetail(userId, soId) {
     try {
+      const tokenResult = await tokenService.getActiveToken(userId);
+      if (!tokenResult.success) {
+        throw new Error('Token tidak valid');
+      }
+
+      const baseURL = await this.getBaseURL(tokenResult.token.accessToken);
       const headers = await this.getHeaders(userId);
       
       // Menggunakan endpoint /detail.do sesuai API Accurate
-      const response = await axios.get(`${this.baseURL}/sales-order/detail.do`, {
+      const response = await axios.get(`${baseURL}/sales-order/detail.do`, {
         headers,
-        params: { id: soId }
+        params: { id: soId },
+        maxRedirects: 5,
+        validateStatus: (status) => status < 400
       });
 
       return {
@@ -512,9 +684,18 @@ class AccurateService {
   // Save sales order
   async saveSalesOrder(userId, data) {
     try {
+      const tokenResult = await tokenService.getActiveToken(userId);
+      if (!tokenResult.success) {
+        throw new Error('Token tidak valid');
+      }
+
+      const baseURL = await this.getBaseURL(tokenResult.token.accessToken);
       const headers = await this.getHeaders(userId);
-      const response = await axios.post(`${this.baseURL}/sales-order/save.do`, data, {
-        headers
+      
+      const response = await axios.post(`${baseURL}/sales-order/save.do`, data, {
+        headers,
+        maxRedirects: 5,
+        validateStatus: (status) => status < 400
       });
 
       return {
@@ -534,9 +715,18 @@ class AccurateService {
   // Bulk save sales orders
   async bulkSaveSalesOrders(userId, dataArray) {
     try {
+      const tokenResult = await tokenService.getActiveToken(userId);
+      if (!tokenResult.success) {
+        throw new Error('Token tidak valid');
+      }
+
+      const baseURL = await this.getBaseURL(tokenResult.token.accessToken);
       const headers = await this.getHeaders(userId);
-      const response = await axios.post(`${this.baseURL}/sales-order/bulk-save.do`, dataArray, {
-        headers
+      
+      const response = await axios.post(`${baseURL}/sales-order/bulk-save.do`, dataArray, {
+        headers,
+        maxRedirects: 5,
+        validateStatus: (status) => status < 400
       });
 
       return {
@@ -556,10 +746,19 @@ class AccurateService {
   // Delete sales order
   async deleteSalesOrder(userId, soId) {
     try {
+      const tokenResult = await tokenService.getActiveToken(userId);
+      if (!tokenResult.success) {
+        throw new Error('Token tidak valid');
+      }
+
+      const baseURL = await this.getBaseURL(tokenResult.token.accessToken);
       const headers = await this.getHeaders(userId);
-      const response = await axios.delete(`${this.baseURL}/sales-order/delete.do`, {
+      
+      const response = await axios.delete(`${baseURL}/sales-order/delete.do`, {
         headers,
-        params: { id: soId }
+        params: { id: soId },
+        maxRedirects: 5,
+        validateStatus: (status) => status < 400
       });
 
       return {
@@ -579,10 +778,21 @@ class AccurateService {
   // Manual close sales order
   async manualCloseSalesOrder(userId, soId) {
     try {
+      const tokenResult = await tokenService.getActiveToken(userId);
+      if (!tokenResult.success) {
+        throw new Error('Token tidak valid');
+      }
+
+      const baseURL = await this.getBaseURL(tokenResult.token.accessToken);
       const headers = await this.getHeaders(userId);
-      const response = await axios.post(`${this.baseURL}/sales-order/manual-close-order.do`, 
+      
+      const response = await axios.post(`${baseURL}/sales-order/manual-close-order.do`, 
         { id: soId },
-        { headers }
+        { 
+          headers,
+          maxRedirects: 5,
+          validateStatus: (status) => status < 400
+        }
       );
 
       return {

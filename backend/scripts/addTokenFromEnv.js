@@ -57,7 +57,7 @@ async function addTokenFromEnv() {
     // 4. Cek superadmin user
     console.log('4. Finding superadmin user...');
     const [users] = await pool.query(`
-      SELECT id, username 
+      SELECT id, nama 
       FROM users 
       WHERE role = 'superadmin' 
       LIMIT 1
@@ -70,7 +70,7 @@ async function addTokenFromEnv() {
     }
     
     const userId = users[0].id;
-    console.log(`   ✓ Found superadmin: ${users[0].username} (ID: ${userId})`);
+    console.log(`   ✓ Found superadmin: ${users[0].nama} (ID: ${userId})`);
     console.log('');
 
     // 5. Cek apakah sudah ada token aktif
