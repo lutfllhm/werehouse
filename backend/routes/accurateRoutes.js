@@ -5,6 +5,7 @@ const { verifikasiToken } = require('../middleware/auth');
 
 // OAuth Routes
 router.get('/auth/url', verifikasiToken, accurateController.getAuthUrl);
+router.get('/auth', accurateController.redirectToAuth); // Redirect langsung tanpa token
 router.get('/callback', accurateController.handleCallback);
 router.post('/refresh-token', verifikasiToken, accurateController.refreshToken);
 router.post('/disconnect', verifikasiToken, accurateController.disconnect);

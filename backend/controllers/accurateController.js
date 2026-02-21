@@ -38,6 +38,33 @@ exports.getAuthUrl = (req, res) => {
   }
 };
 
+// Redirect to Accurate OAuth (tanpa perlu token)
+exports.redirectToAuth = (req, res) => {
+  try {
+    const scopes = [
+      'item_view',
+      'item_save',
+      'sales_order_view',
+      'sales_order_save',
+      'customer_view'
+    ];
+
+    const authUrl = `https://account.accurate.id/oauth/authorize?` +
+      `client_id=${process.env.ACCURATE_CLIENT_ID}` +
+      `&redirect_uri=${encodeURIComponent(process.env.ACCURATE_REDIRECT_URI)}` +
+      `&response_type=code` +
+      `&scope=${scopes.join(' ')}`;
+
+    console.log('Redirecting to Accurate OAuth:', authUrl);
+    
+    // Redirect langsung ke Accurate
+    res.redirect(authUrl);
+  } catch (error) {
+    console.error('Error redirecting to auth:', error);
+    res.status(500).send('Gagal redirect ke Accurate OAuth');
+  }
+};
+
 // Handle OAuth Callback
 exports.handleCallback = async (req, res) => {
   try {
