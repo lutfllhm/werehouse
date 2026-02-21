@@ -46,6 +46,9 @@ class AccurateService {
       const timestamp = this.generateTimestamp();
       const signature = this.generateSignature(timestamp);
 
+      console.log('Getting host from API token...');
+      console.log('Request URL:', `${this.accountURL}/api/api-token.do`);
+
       const response = await axios.post(
         `${this.accountURL}/api/api-token.do`,
         {},
@@ -61,16 +64,39 @@ class AccurateService {
         }
       );
 
-      if (response.data.s && response.data.d['data usaha']) {
-        const host = response.data.d['data usaha'].host;
+      console.log('API Token Response:', JSON.stringify(response.data, null, 2));
+
+      // Cek berbagai kemungkinan struktur response
+      let host = null;
+      
+      if (response.data.s && response.data.d) {
+        // Coba berbagai kemungkinan path
+        if (response.data.d['data usaha']?.host) {
+          host = response.data.d['data usaha'].host;
+        } else if (response.data.d.dataUsaha?.host) {
+          host = response.data.d.dataUsaha.host;
+        } else if (response.data.d.host) {
+          host = response.data.d.host;
+        } else if (response.data.d.session?.host) {
+          host = response.data.d.session.host;
+        }
+      }
+
+      if (host) {
+        console.log('Host found:', host);
         this.hostCache.set(accessToken, host);
         this.hostCacheTime.set(accessToken, Date.now());
         return host;
       }
 
-      throw new Error('Failed to get host from API token');
+      console.error('Response structure:', JSON.stringify(response.data, null, 2));
+      throw new Error('Failed to get host from API token - host not found in response');
     } catch (error) {
       console.error('Error getting host:', error.message);
+      if (error.response) {
+        console.error('Response status:', error.response.status);
+        console.error('Response data:', error.response.data);
+      }
       throw error;
     }
   }
